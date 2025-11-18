@@ -197,7 +197,7 @@ function UsersManagement({ users, setUsers }) {
   }
 
   return (
-    <div className="bg-white rounded-lg border border-[#e5e5e5]">
+    <div className="bg-white rounded-lg border-[#e5e5e5]">
       <div className="px-6 py-4 border-b border-[#e5e5e5]">
         <h2 className="text-lg font-semibold text-[#1a1a1a]">Gestión de Usuarios</h2>
         <p className="text-sm text-[#6b6b6b] mt-1">Visualiza y gestiona la información de los usuarios registrados</p>

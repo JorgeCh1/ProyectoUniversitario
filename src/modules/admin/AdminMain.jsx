@@ -93,7 +93,7 @@ export default function AdminDashboard() {
   ])
 
   return (
-    <div className="min-h-screen bg-[#f5f3f0]">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="bg-white border-b border-[#e5e5e5]">
         <div className="max-w-[1400px] mx-auto px-6 py-4 flex items-center justify-between">
@@ -120,35 +120,35 @@ export default function AdminDashboard() {
         <div className="flex gap-8">
           {/* Sidebar */}
           <aside className="w-64 flex-shrink-0">
-            <nav className="bg-white rounded-lg overflow-hidden border border-[#e5e5e5]">
+            <nav className="space-y-3">
               <button
                 onClick={() => setActiveTab("users")}
-                className={`w-full text-left px-6 py-3 text-sm transition-colors ${
-                  activeTab === "users" ? "bg-[#1a1a1a] text-white" : "text-[#1a1a1a] hover:bg-[#f5f3f0]"
+                className={`w-full text-left px-6 py-3 text-sm rounded-md border border-[#e5e5e5] transition-colors ${
+                  activeTab === "users" ? "bg-[#1a1a1a] text-white" : "bg-white text-[#1a1a1a] hover:bg-gray-100"
                 }`}
               >
                 Gestión de Usuarios
               </button>
               <button
                 onClick={() => setActiveTab("products")}
-                className={`w-full text-left px-6 py-3 text-sm transition-colors ${
-                  activeTab === "products" ? "bg-[#1a1a1a] text-white" : "text-[#1a1a1a] hover:bg-[#f5f3f0]"
+                className={`w-full text-left px-6 py-3 text-sm rounded-md border border-[#e5e5e5] transition-colors ${
+                  activeTab === "products" ? "bg-[#1a1a1a] text-white" : "bg-white text-[#1a1a1a] hover:bg-gray-100"
                 }`}
               >
                 Gestión de Productos
               </button>
               <button
                 onClick={() => setActiveTab("sales")}
-                className={`w-full text-left px-6 py-3 text-sm transition-colors ${
-                  activeTab === "sales" ? "bg-[#1a1a1a] text-white" : "text-[#1a1a1a] hover:bg-[#f5f3f0]"
+                className={`w-full text-left px-6 py-3 text-sm rounded-md border border-[#e5e5e5] transition-colors ${
+                  activeTab === "sales" ? "bg-[#1a1a1a] text-white" : "bg-white text-[#1a1a1a] hover:bg-gray-100"
                 }`}
               >
                 Ventas y Facturación
               </button>
               <button
                 onClick={() => setActiveTab("payments")}
-                className={`w-full text-left px-6 py-3 text-sm transition-colors ${
-                  activeTab === "payments" ? "bg-[#1a1a1a] text-white" : "text-[#1a1a1a] hover:bg-[#f5f3f0]"
+                className={`w-full text-left px-6 py-3 text-sm rounded-md border border-[#e5e5e5] transition-colors ${
+                  activeTab === "payments" ? "bg-[#1a1a1a] text-white" : "bg-white text-[#1a1a1a] hover:bg-gray-100"
                 }`}
               >
                 Monitoreo de Pagos
@@ -439,7 +439,7 @@ function ProductsManagement({
           </div>
           <Dialog open={isAddingNew} onOpenChange={setIsAddingNew}>
             <DialogTrigger asChild>
-              <Button className="bg-[#1a1a1a] hover:bg-[#2a2a2a]">Nuevo Producto</Button>
+              <Button className="bg-[#1a1a1a] hover:bg-[#2a2a2a]">Registrar Nuevo Producto</Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
@@ -647,7 +647,7 @@ function ProductForm({
           Cancelar
         </Button>
         <Button type="submit" className="bg-[#1a1a1a] hover:bg-[#2a2a2a]">
-          {isNew ? "Registrar producto" : "Guardar cambios"}
+          {isNew ? "Registrar Producto" : "Guardar cambios"}
         </Button>
       </div>
     </form>

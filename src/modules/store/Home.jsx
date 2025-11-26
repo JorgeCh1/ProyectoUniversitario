@@ -1,27 +1,47 @@
-import { useEffect, useRef, useState } from 'react';
-import { Button } from '@/components/ui/button'
+import { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import productService from "@/modules/store/services/productService";
+import { Link } from "react-router-dom";
+import cartService from "@/modules/store/services/cartService";
 
 export default function Home() {
   const collections = [
-    { name: 'Black Friday', image: '/images/placeholder.png' },
-    { name: 'Una nueva perspectiva', image: '/images/placeholder.png' },
-    { name: 'Mujeres', image: '/images/placeholder.png' },
+    { name: "Black Friday", image: "/images/placeholder.png" },
+    { name: "Una nueva perspectiva", image: "/images/placeholder.png" },
+    { name: "Mujeres", image: "/images/placeholder.png" },
   ];
 
-  const featuredProducts = Array.from({ length: 8 }).map((_, i) => ({
-    id: i + 1,
-    name: `Producto destacado ${i + 1}`,
-    price: `$${(79 + i * 10).toFixed(2)}`,
-    image: '/images/placeholder.png',
-  }));
-
+  // 🔽 antes era una constante, ahora viene del servicio
+  const [featuredProducts, setFeaturedProducts] = useState([]);
   const [heroVisible, setHeroVisible] = useState(false);
   const [activeCollection, setActiveCollection] = useState(0);
-  const [addedToBag, setAddedToBag] = useState(false);
+  const [addedToBag] = useState(false);
 
   const featuredSectionRef = useRef(null);
 
-  // Animación de entrada del hero
+  // cargar productos destacados
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadFeatured = async () => {
+      try {
+        const data = await productService.listFeatured(8);
+        if (!cancelled) {
+          setFeaturedProducts(data);
+        }
+      } catch (err) {
+        console.error("Error cargando productos destacados:", err);
+      }
+    };
+
+    loadFeatured();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // animación hero
   useEffect(() => {
     const timer = setTimeout(() => setHeroVisible(true), 50);
     return () => clearTimeout(timer);
@@ -29,14 +49,23 @@ export default function Home() {
 
   const handleHeroClick = () => {
     if (featuredSectionRef.current) {
-      featuredSectionRef.current.scrollIntoView({ behavior: 'smooth' });
+      featuredSectionRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
 
-  const handleAddToBag = () => {
-    setAddedToBag(true);
-    setTimeout(() => setAddedToBag(false), 2000);
+  const handleAddToBag = (p) => {
+    cartService.addItem({
+      id: p.id,
+      name: p.name,
+      price: p.price,
+      image: p.image,
+      quantity: 1,
+      color: null,
+      size: null,
+    });
   };
+
+  const formatPrice = (price) => `$${price.toFixed(2)}`; //
 
   return (
     <div className="bg-white text-slate-900">
@@ -51,7 +80,11 @@ export default function Home() {
         <div className="relative max-w-6xl mx-auto px-4">
           <div
             className={`max-w-lg space-y-4 transform transition-all duration-700 ease-out
-              ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
+              ${
+                heroVisible
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-4"
+              }
             `}
           >
             <p className="uppercase tracking-[0.2em] text-sm text-slate-100/80 ">
@@ -94,7 +127,7 @@ export default function Home() {
                 relative h-72 overflow-hidden rounded-lg group shadow-sm
                 transition-transform duration-500 ease-out
                 hover:-translate-y-1 hover:shadow-lg
-                ${index === activeCollection ? 'block' : 'hidden sm:block'}
+                ${index === activeCollection ? "block" : "hidden sm:block"}
               `}
             >
               <div
@@ -120,7 +153,11 @@ export default function Home() {
               onClick={() => setActiveCollection(index)}
               className={`
                 h-1.5 rounded-full transition-all
-                ${index === activeCollection ? 'w-4 bg-brand-dark' : 'w-1.5 bg-brand-light'}
+                ${
+                  index === activeCollection
+                    ? "w-4 bg-brand-dark"
+                    : "w-1.5 bg-brand-light"
+                }
               `}
               aria-label={`Ir a colección ${index + 1}`}
             />
@@ -153,17 +190,21 @@ export default function Home() {
               key={p.id}
               className="rounded-lg border bg-white overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300"
             >
-              <div
-                className="h-40 md:h-48 bg-cover bg-center"
-                style={{ backgroundImage: `url('${p.image}')` }}
-              />
+              <Link to={`/products/${p.id}`}>
+                <div
+                  className="h-40 md:h-48 bg-cover bg-center"
+                  style={{ backgroundImage: `url('${p.image}')` }}
+                />
+              </Link>
               <div className="p-4 space-y-2">
-                <h3 className="text-sm font-medium tracking-tight line-clamp-1">
-                  {p.name}
-                </h3>
-                <p className="text-sm text-slate-500">{p.price}</p>
+                <Link to={`/products/${p.id}`}>
+                  <h3 className="text-sm font-medium tracking-tight line-clamp-1 hover:underline">
+                    {p.name}
+                  </h3>
+                </Link>
+                <p className="text-sm text-slate-500">{formatPrice(p.price)}</p>
                 <Button
-                  onClick={handleAddToBag}
+                  onClick={() => handleAddToBag(p)}
                   className="mt-2 w-full rounded-full py-2 text-xs"
                 >
                   Add to bag
@@ -192,12 +233,13 @@ export default function Home() {
           </h2>
           <p className="text-sm text-slate-600">
             A considered curation of classic, relaxed silhouettes crafted with
-            premium fabrics and functional details. Designed to move effortlessly
-            through every part of your day and every corner of the world.
+            premium fabrics and functional details. Designed to move
+            effortlessly through every part of your day and every corner of the
+            world.
           </p>
           <p className="text-sm text-slate-600">
-            From timeless basics to statement pieces, our collections are created
-            to mix, match and last beyond one season.
+            From timeless basics to statement pieces, our collections are
+            created to mix, match and last beyond one season.
           </p>
           <button className="text-sm underline underline-offset-4 text-brand-dark hover:text-brand transition">
             Learn more about us
@@ -235,9 +277,7 @@ export default function Home() {
             <p className="text-xs uppercase tracking-[0.25em] text-slate-100/80">
               New in
             </p>
-            <h2 className="text-3xl font-semibold">
-              Our high summer lookbook
-            </h2>
+            <h2 className="text-3xl font-semibold">Our high summer lookbook</h2>
             <p className="text-sm text-slate-100/90">
               Discover the pieces styled together for the days that turn into
               nights.

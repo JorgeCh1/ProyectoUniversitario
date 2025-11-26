@@ -1,41 +1,63 @@
+import { Link } from "react-router-dom";
 
 export default function Navbar() {
   return (
     <header className="border-b border-slate-200 bg-white">
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          <a href="/" className="text-2xl font-light tracking-wide text-brand-dark hover:opacity-70 transition-opacity">
+          <Link
+            to="/"
+            className="text-2xl font-light tracking-wide text-brand-dark hover:opacity-70 transition-opacity"
+          >
             mila
-          </a>
+          </Link>
 
           <nav className="hidden md:flex items-center gap-8">
-            <a href="#" className="text-sm text-brand-dark hover:text-brand transition-colors">
+            <Link
+              to="/"
+              className="text-sm text-brand-dark hover:text-brand transition-colors"
+            >
               New Arrivals
-            </a>
-            <a href="#" className="text-sm text-brand-dark hover:text-brand transition-colors">
+            </Link>
+            <Link
+              to="/products"
+              className="text-sm text-brand-dark hover:text-brand transition-colors"
+            >
               Swimwear
-            </a>
-            <a href="#" className="text-sm text-brand-dark hover:text-brand transition-colors">
+            </Link>
+            <Link
+              to="/products"
+              className="text-sm text-brand-dark hover:text-brand transition-colors"
+            >
               Collections
-            </a>
-            <a href="#" className="text-sm text-brand-dark hover:text-brand transition-colors">
+            </Link>
+            <Link
+              to="/about"
+              className="text-sm text-brand-dark hover:text-brand transition-colors"
+            >
               About Us
-            </a>
-            <a href="#" className="text-sm text-brand-dark hover:text-brand transition-colors">
+            </Link>
+            <Link
+              to="/demos"
+              className="text-sm text-brand-dark hover:text-brand transition-colors"
+            >
               Demos
-            </a>
+            </Link>
           </nav>
 
           <div className="flex items-center gap-6">
-            <a
-              href="#"
+            <Link
+              to="/account"
               className="text-sm text-brand-dark hover:text-brand transition-colors hidden md:block"
             >
               Account
-            </a>
+            </Link>
 
             {/* Search Icon */}
-            <button aria-label="Search" className="text-brand-dark hover:text-brand transition-colors">
+            <button
+              aria-label="Search"
+              className="text-brand-dark hover:text-brand transition-colors"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -54,7 +76,7 @@ export default function Navbar() {
 
             {/* Cart Icon with Badge */}
             <a
-              href="#"
+              href="/cart"
               className="relative text-brand-dark hover:text-brand transition-colors"
               aria-label="Shopping cart"
             >
@@ -80,5 +102,5 @@ export default function Navbar() {
         </div>
       </div>
     </header>
-  )
+  );
 }

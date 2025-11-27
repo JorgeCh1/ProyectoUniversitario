@@ -84,7 +84,9 @@ export default function ProductDetail() {
   const colors = product?.colors ?? ["Vermont"];
   const sizes = product?.sizes ?? ["4", "6", "8", "10", "12"];
 
-  const priceLabel = product ? `£${Number(product.price).toFixed(2)}` : "£0.00";
+  const priceLabel = product
+    ? `₡${Number(product.price).toLocaleString("es-CR")}`
+    : "₡0";
 
   const handleBack = () => navigate(-1);
 
@@ -184,7 +186,7 @@ export default function ProductDetail() {
                 stock > 0 ? "text-emerald-600" : "text-red-500"
               }`}
             >
-              {stock > 0 ? `${stock} in stock` : "Out of stock"}
+              {stock > 0 ? `${stock} en stock` : "Agotado"}
             </p>
           </div>
 
@@ -220,7 +222,7 @@ export default function ProductDetail() {
           {/* Size (también opcional hasta que lo conectes al admin) */}
           <div className="space-y-2">
             <p className="text-xs font-medium text-slate-700 uppercase tracking-[0.18em]">
-              Size
+              Talla
             </p>
             <div className="flex flex-wrap gap-2">
               {sizes.map((s) => (
@@ -267,7 +269,7 @@ export default function ProductDetail() {
               className="flex-1 rounded-full py-2 text-sm font-medium"
               onClick={handleAddToCart}
             >
-              {stock === 0 ? "Out of stock" : "Add to Cart"}
+              {stock === 0 ? "Agotado" : "Añadir al carrito"}
             </Button>
           </div>
 
@@ -296,11 +298,12 @@ export default function ProductDetail() {
               </svg>
 
               <h4 className="text-sm font-semibold text-slate-900">
-                Free shipping
+                Envío gratis
               </h4>
 
               <p className="text-xs text-slate-600">
-                Free standard shipping on all orders over £80.
+                Envío estándar gratuito en todos los pedidos superiores a
+                ₡50,000.
               </p>
             </div>
 
@@ -327,11 +330,11 @@ export default function ProductDetail() {
               </svg>
 
               <h4 className="text-sm font-semibold text-slate-900">
-                30-day guarantee
+                Garantía de 30 días
               </h4>
 
               <p className="text-xs text-slate-600">
-                Easy returns or exchanges within 30 days of purchase.
+                Devoluciones o cambios fáciles dentro de 30 días de la compra.
               </p>
             </div>
 
@@ -358,11 +361,12 @@ export default function ProductDetail() {
               </svg>
 
               <h4 className="text-sm font-semibold text-slate-900">
-                Personalised support
+                Apoyo personalizado
               </h4>
 
               <p className="text-xs text-slate-600">
-                Our team is here to help you find the perfect fit and style.
+                Nuestro equipo está aquí para ayudarte a encontrar el ajuste y
+                estilo perfecto.
               </p>
             </div>
           </div>
@@ -373,7 +377,7 @@ export default function ProductDetail() {
       {relatedProducts.length > 0 && (
         <div className="mt-6 pt-6 border-t border-slate-200">
           <h2 className="text-lg md:text-xl font-semibold tracking-tight mb-4">
-            You may also like
+            También te puede gustar
           </h2>
 
           <div className="relative">

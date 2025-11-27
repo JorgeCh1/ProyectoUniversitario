@@ -17,31 +17,31 @@ export default function Navbar() {
               to="/"
               className="text-sm text-brand-dark hover:text-brand transition-colors"
             >
-              New Arrivals
+              Nuevas Llegadas
             </Link>
             <Link
               to="/products"
               className="text-sm text-brand-dark hover:text-brand transition-colors"
             >
-              Swimwear
+              Traje de Baño
             </Link>
             <Link
               to="/products"
               className="text-sm text-brand-dark hover:text-brand transition-colors"
             >
-              Collections
+              Colecciones
             </Link>
             <Link
               to="/about"
               className="text-sm text-brand-dark hover:text-brand transition-colors"
             >
-              About Us
+              Sobre Nosotros
             </Link>
             <Link
               to="/demos"
               className="text-sm text-brand-dark hover:text-brand transition-colors"
             >
-              Demos
+              Demostraciones
             </Link>
           </nav>
 
@@ -50,12 +50,12 @@ export default function Navbar() {
               to="/account"
               className="text-sm text-brand-dark hover:text-brand transition-colors hidden md:block"
             >
-              Account
+              Cuenta
             </Link>
 
             {/* Search Icon */}
             <button
-              aria-label="Search"
+              aria-label="Buscar"
               className="text-brand-dark hover:text-brand transition-colors"
             >
               <svg
@@ -78,7 +78,7 @@ export default function Navbar() {
             <a
               href="/cart"
               className="relative text-brand-dark hover:text-brand transition-colors"
-              aria-label="Shopping cart"
+              aria-label="Carrito de compras"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

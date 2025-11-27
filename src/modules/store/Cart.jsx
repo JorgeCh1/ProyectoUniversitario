@@ -25,7 +25,7 @@ export default function Cart() {
     [items]
   );
 
-  const formatPrice = (price) => `£${Number(price).toFixed(2)}`;
+  const formatPrice = (price) => `₡${Number(price).toLocaleString("es-CR")}`;
 
   const handleQtyChange = (item, delta) => {
     const newQty = Math.max(1, item.quantity + delta);
@@ -53,25 +53,25 @@ export default function Cart() {
   return (
     <section className="max-w-4xl mx-auto px-4 py-10">
       <h1 className="text-center text-2xl md:text-3xl font-semibold tracking-tight mb-8">
-        Shopping cart
+        Carrito de compras
       </h1>
 
       <p className="text-center text-[11px] text-slate-500 mb-6">
-        Cart for user: <span className="font-medium">{meta.userId}</span> ·
-        Created at: {createdAtLabel}
+        Carrito para usuario: <span className="font-medium">{meta.userId}</span>{" "}
+        · Creado en: {createdAtLabel}
       </p>
 
       {items.length === 0 ? (
         <p className="text-center text-sm text-slate-500">
-          Your cart is empty.
+          Tu carrito está vacío.
         </p>
       ) : (
         <>
           {/* CABECERA */}
           <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr] text-xs text-slate-500 border-b border-slate-200 pb-2 mb-4">
-            <span>Product</span>
-            <span className="text-right">Price</span>
-            <span className="text-center">Quantity</span>
+            <span>Producto</span>
+            <span className="text-right">Precio</span>
+            <span className="text-center">Cantidad</span>
             <span className="text-right">Total</span>
           </div>
 
@@ -103,14 +103,14 @@ export default function Cart() {
                       onClick={() => handleRemove(item)}
                       className="mt-1 text-xs text-slate-400 underline hover:text-slate-700"
                     >
-                      Remove
+                      Eliminar
                     </button>
                   </div>
                 </div>
 
                 {/* PRICE */}
                 <div className="col-span-2 md:col-span-1 md:text-right text-xs text-slate-700">
-                  <span className="md:hidden mr-1 font-medium">Price:</span>
+                  <span className="md:hidden mr-1 font-medium">Precio:</span>
                   {formatPrice(item.price)}
                 </div>
 
@@ -153,13 +153,14 @@ export default function Cart() {
               onClick={handleClear}
               className="underline hover:text-slate-800"
             >
-              Clear cart
+              Limpiar carrito
             </button>
             <p>
-              <span className="underline cursor-pointer">Update cart</span> |{" "}
               <span className="underline cursor-pointer">
-                Continue shopping
-              </span>
+                Actualizar carrito
+              </span>{" "}
+              |{" "}
+              <span className="underline cursor-pointer">Seguir comprando</span>
             </p>
           </div>
 
@@ -172,23 +173,23 @@ export default function Cart() {
           {/* NOTA */}
           <div className="mb-6">
             <p className="text-[11px] uppercase tracking-[0.18em] text-center text-slate-500 mb-2">
-              Add a note to your order
+              Añade una nota a tu pedido
             </p>
             <textarea
               className="w-full border border-slate-200 rounded-md p-3 text-sm focus:outline-none focus:ring-1 focus:ring-slate-300"
               rows={3}
-              placeholder="Enter note"
+              placeholder="Ingresa una nota"
             />
           </div>
 
           {/* INFO TAX + CHECKOUT */}
           <p className="text-[11px] text-center text-slate-500 mb-3">
-            Tax included and shipping calculated at checkout.
+            Impuestos incluidos y envío calculado en el checkout.
           </p>
 
           <div className="flex justify-center">
             <Button className="rounded-full px-10 py-2 text-sm bg-[#d3a8ff] hover:bg-[#c995ff] text-white">
-              Check out
+              Pagar
             </Button>
           </div>
         </>

@@ -39,7 +39,7 @@ export default function Checkout() {
   const tax = subtotal * 0.13;
   const total = subtotal + tax;
 
-  const formatPrice = (price) => `₡${Number(price).toFixed(2)}`; // o £
+  const formatPrice = (price) => `₡${Number(price).toLocaleString("es-CR")}`;
 
   const hasErrors =
     !name.trim() ||
@@ -101,13 +101,13 @@ export default function Checkout() {
     <section className="max-w-5xl mx-auto px-4 py-10">
       {/* TÍTULO */}
       <h1 className="text-center text-2xl md:text-3xl font-semibold tracking-tight mb-1">
-        <span className="text-slate-400">Shopping cart</span>{" "}
+        <span className="text-slate-400">Carrito de compras</span>{" "}
         <span className="text-slate-400">›</span>{" "}
-        <span className="text-slate-900">Address & Payment</span>
+        <span className="text-slate-900">Dirección y Pago</span>
       </h1>
       <p className="text-center text-[11px] text-slate-500 mb-8">
-        Cart for user: <span className="font-medium">{meta.userId}</span> ·
-        Created at: {createdAtLabel}
+        Carrito para usuario: <span className="font-medium">{meta.userId}</span>{" "}
+        · Creado en: {createdAtLabel}
       </p>
 
       <div className="grid gap-10 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
@@ -115,23 +115,25 @@ export default function Checkout() {
         <div className="space-y-6 md:pr-6 md:border-r md:border-slate-200">
           <div>
             <h2 className="text-sm font-semibold text-slate-900 mb-2">
-              Shipping information
+              Información de envío
             </h2>
 
             {/* Name */}
             <div className="space-y-1 mb-3">
               <label className="text-xs font-medium text-slate-700">
-                Name *
+                Nombre *
               </label>
               <input
                 type="text"
                 className="w-full border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-300"
-                placeholder="Enter your name"
+                placeholder="Ingresa tu nombre"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
               {submitted && !name.trim() && (
-                <p className="text-[11px] text-red-500">Name is required.</p>
+                <p className="text-[11px] text-red-500">
+                  El nombre es requerido.
+                </p>
               )}
             </div>
 
@@ -139,33 +141,37 @@ export default function Checkout() {
             <div className="grid gap-4 md:grid-cols-2 mb-3">
               <div className="space-y-1">
                 <label className="text-xs font-medium text-slate-700">
-                  Email address *
+                  Correo electrónico *
                 </label>
                 <input
                   type="email"
                   className="w-full border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-300"
-                  placeholder="Enter your email"
+                  placeholder="Ingresa tu correo"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
                 {submitted && !email.trim() && (
-                  <p className="text-[11px] text-red-500">Email is required.</p>
+                  <p className="text-[11px] text-red-500">
+                    El correo es requerido.
+                  </p>
                 )}
               </div>
 
               <div className="space-y-1">
                 <label className="text-xs font-medium text-slate-700">
-                  Phone number *
+                  Número de teléfono *
                 </label>
                 <input
                   type="tel"
                   className="w-full border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-300"
-                  placeholder="Enter your phone number"
+                  placeholder="Ingresa tu número de teléfono"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                 />
                 {submitted && !phone.trim() && (
-                  <p className="text-[11px] text-red-500">Phone is required.</p>
+                  <p className="text-[11px] text-red-500">
+                    El teléfono es requerido.
+                  </p>
                 )}
               </div>
             </div>
@@ -173,50 +179,54 @@ export default function Checkout() {
             {/* Country */}
             <div className="space-y-1 mb-3">
               <label className="text-xs font-medium text-slate-700">
-                Country *
+                País *
               </label>
               <select
                 className="w-full border border-slate-200 rounded-md px-3 py-2 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-slate-300"
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
               >
-                <option value="">Select Country</option>
+                <option value="">Selecciona País</option>
                 <option value="cr">Costa Rica</option>
-                <option value="us">United States</option>
-                <option value="uk">United Kingdom</option>
-                <option value="other">Other</option>
+                <option value="us">Estados Unidos</option>
+                <option value="uk">Reino Unido</option>
+                <option value="other">Otro</option>
               </select>
               {submitted && !country && (
-                <p className="text-[11px] text-red-500">Country is required.</p>
+                <p className="text-[11px] text-red-500">
+                  El país es requerido.
+                </p>
               )}
             </div>
 
             {/* Address */}
             <div className="space-y-1 mb-3">
               <label className="text-xs font-medium text-slate-700">
-                Your address *
+                Tu dirección *
               </label>
               <textarea
                 className="w-full border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-300"
                 rows={3}
-                placeholder="Enter full address"
+                placeholder="Ingresa la dirección completa"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
               />
               {submitted && !address.trim() && (
-                <p className="text-[11px] text-red-500">Address is required.</p>
+                <p className="text-[11px] text-red-500">
+                  La dirección es requerida.
+                </p>
               )}
             </div>
 
             {/* Note opcional */}
             <div className="space-y-1">
               <label className="text-xs font-medium text-slate-700">
-                Note (optional)
+                Nota (opcional)
               </label>
               <textarea
                 className="w-full border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-300"
                 rows={2}
-                placeholder="Add a note for your order"
+                placeholder="Añade una nota para tu pedido"
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
               />
@@ -226,7 +236,7 @@ export default function Checkout() {
           {/* MÉTODO DE PAGO */}
           <div className="pt-4 border-t border-slate-200">
             <h2 className="text-sm font-semibold text-slate-900 mb-2">
-              Payment method
+              Método de pago
             </h2>
 
             <div className="space-y-2 text-sm">
@@ -238,7 +248,7 @@ export default function Checkout() {
                   checked={paymentMethod === "card"}
                   onChange={() => setPaymentMethod("card")}
                 />
-                <span>Credit / Debit card</span>
+                <span>Tarjeta de crédito / débito</span>
               </label>
 
               <label className="flex items-center gap-2">
@@ -260,13 +270,13 @@ export default function Checkout() {
                   checked={paymentMethod === "transfer"}
                   onChange={() => setPaymentMethod("transfer")}
                 />
-                <span>Bank transfer</span>
+                <span>Transferencia bancaria</span>
               </label>
             </div>
 
             {submitted && items.length === 0 && (
               <p className="mt-2 text-[11px] text-red-500">
-                Your cart is empty.
+                Tu carrito está vacío.
               </p>
             )}
 
@@ -275,12 +285,12 @@ export default function Checkout() {
               onClick={handleConfirmPayment}
               className="mt-4 rounded-full px-6 py-2 text-sm bg-[#d3a8ff] hover:bg-[#c995ff] text-white"
             >
-              Confirm payment
+              Confirmar pago
             </Button>
 
             {paymentStatus === "SUCCESS" && (
               <p className="mt-2 text-[11px] text-emerald-600">
-                Payment registered as SUCCESS (client-side simulation).
+                Pago registrado como EXITOSO (simulación del lado del cliente).
               </p>
             )}
           </div>
@@ -289,7 +299,7 @@ export default function Checkout() {
         {/* RESUMEN DE FACTURA */}
         <aside className="space-y-4">
           <h2 className="text-xs font-semibold text-slate-700 uppercase tracking-[0.18em]">
-            Invoice summary
+            Resumen de factura
           </h2>
 
           <div className="border border-slate-200 rounded-lg p-4 space-y-2 text-sm">
@@ -298,7 +308,7 @@ export default function Checkout() {
               <span className="text-slate-900">{formatPrice(subtotal)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-600">Tax (13%)</span>
+              <span className="text-slate-600">Impuesto (13%)</span>
               <span className="text-slate-900">{formatPrice(tax)}</span>
             </div>
 
@@ -315,21 +325,21 @@ export default function Checkout() {
             {paymentMethod === "card" && (
               <div>
                 <p className="font-semibold text-slate-900 mb-1">
-                  Credit / Debit Card (Demo)
+                  Tarjeta de crédito / débito (Demo)
                 </p>
-                <p>Use the following demo information:</p>
+                <p>Utiliza la siguiente información de demostración:</p>
                 <ul className="mt-2 text-xs space-y-1">
                   <li>
-                    • Card number: <strong>4242 4242 4242 4242</strong>
+                    • Número de tarjeta: <strong>4242 4242 4242 4242</strong>
                   </li>
                   <li>
-                    • Expiration: <strong>12 / 28</strong>
+                    • Vencimiento: <strong>12 / 28</strong>
                   </li>
                   <li>
                     • CVC: <strong>123</strong>
                   </li>
                   <li>
-                    • Name: <strong>Bellas Boutique Test</strong>
+                    • Nombre: <strong>Bellas Boutique Test</strong>
                   </li>
                 </ul>
               </div>
@@ -338,16 +348,16 @@ export default function Checkout() {
             {paymentMethod === "sinpe" && (
               <div>
                 <p className="font-semibold text-slate-900 mb-1">SINPE Móvil</p>
-                <p>Send the payment to the following number:</p>
+                <p>Envía el pago al siguiente número:</p>
                 <ul className="mt-2 text-xs space-y-1">
                   <li>
-                    • Number: <strong>+506 8888-1234</strong>
+                    • Número: <strong>+506 8888-1234</strong>
                   </li>
                   <li>
-                    • Name: <strong>Bellas Boutique CR</strong>
+                    • Nombre: <strong>Bellas Boutique CR</strong>
                   </li>
                   <li>
-                    • Bank: <strong>BAC Credomatic</strong>
+                    • Banco: <strong>BAC Credomatic</strong>
                   </li>
                 </ul>
               </div>
@@ -356,22 +366,23 @@ export default function Checkout() {
             {paymentMethod === "transfer" && (
               <div>
                 <p className="font-semibold text-slate-900 mb-1">
-                  Bank Transfer
+                  Transferencia bancaria
                 </p>
-                <p>Make the transfer to:</p>
+                <p>Realiza la transferencia a:</p>
                 <ul className="mt-2 text-xs space-y-1">
                   <li>
-                    • Bank: <strong>Banco Nacional</strong>
+                    • Banco: <strong>Banco Nacional</strong>
                   </li>
                   <li>
-                    • Account Number:{" "}
+                    • Número de cuenta:{" "}
                     <strong>CR05 0150 0200 0001 2345 67</strong>
                   </li>
                   <li>
-                    • Account Holder: <strong>Bellas Boutique S.A.</strong>
+                    • Titular de la cuenta:{" "}
+                    <strong>Bellas Boutique S.A.</strong>
                   </li>
                   <li>
-                    • Reference: <strong>Order #{Date.now()}</strong>
+                    • Referencia: <strong>Orden #{Date.now()}</strong>
                   </li>
                 </ul>
               </div>

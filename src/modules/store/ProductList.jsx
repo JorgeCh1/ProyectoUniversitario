@@ -73,7 +73,7 @@ export default function ProductList() {
     console.log("Carrito actualizado:", updatedCart);
   };
 
-  const formatPrice = (price) => `£${Number(price).toFixed(2)}`;
+  const formatPrice = (price) => `₡${Number(price).toLocaleString("es-CR")}`;
 
   const collections = [
     {
@@ -115,14 +115,14 @@ export default function ProductList() {
             `}
           >
             <p className="uppercase tracking-[0.2em] text-sm text-slate-100/80">
-              Best Sellers
+              Más vendidos
             </p>
             <h1 className="text-4xl md:text-5xl font-semibold text-white leading-tight">
-              We are committed to mindful, sustainable collections.
+              Comprometidos con colecciones conscientes y sostenibles.
             </h1>
             <p className="text-slate-100/90 text-sm md:text-base">
-              Discover our best-selling pieces, crafted to last beyond one
-              season.
+              Descubre nuestras piezas más vendidas, elaboradas para perdurar
+              más allá de una temporada.
             </p>
           </div>
         </div>
@@ -131,7 +131,7 @@ export default function ProductList() {
       {/* FEATURED COLLECTIONS */}
       <section className="max-w-7xl mx-auto px-4 py-10 space-y-6">
         <h2 className="text-lg md:text-xl font-semibold tracking-tight">
-          Featured Collections
+          Colecciones destacadas
         </h2>
 
         <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
@@ -159,7 +159,7 @@ export default function ProductList() {
         <aside className="w-full md:w-64 md:flex-shrink-0 space-y-8">
           {/* Disponibilidad */}
           <div>
-            <h3 className="text-sm font-semibold mb-2">Availability</h3>
+            <h3 className="text-sm font-semibold mb-2">Disponibilidad</h3>
             <div className="space-y-1 text-sm text-slate-700">
               <label className="flex items-center gap-2">
                 <input
@@ -168,17 +168,17 @@ export default function ProductList() {
                   onChange={(e) => setShowInStockOnly(e.target.checked)}
                   className="rounded border-slate-300"
                 />
-                <span>In stock</span>
+                <span>En stock</span>
               </label>
               <p className="text-xs text-slate-400 pl-6">
-                (Out of stock se mostrará solo si desmarcas este filtro)
+                (Agotado se mostrará solo si desmarcan este filtro)
               </p>
             </div>
           </div>
 
           {/* Categoría */}
           <div>
-            <h3 className="text-sm font-semibold mb-2">Product type</h3>
+            <h3 className="text-sm font-semibold mb-2">Tipo de producto</h3>
             <div className="space-y-1 text-sm text-slate-700">
               {categories.map((cat) => (
                 <button
@@ -191,7 +191,7 @@ export default function ProductList() {
                       : "hover:bg-slate-100"
                   }`}
                 >
-                  {cat === "all" ? "All products" : cat}
+                  {cat === "all" ? "Todos los productos" : cat}
                 </button>
               ))}
             </div>
@@ -203,10 +203,10 @@ export default function ProductList() {
         {/* GRID DE PRODUCTOS */}
         <div className="flex-1">
           {loading ? (
-            <p className="text-sm text-slate-500">Loading products…</p>
+            <p className="text-sm text-slate-500">Cargando productos…</p>
           ) : filteredProducts.length === 0 ? (
             <p className="text-sm text-slate-500">
-              No products found for this filter.
+              No se encontraron productos para este filtro.
             </p>
           ) : (
             <div className="grid gap-6 grid-cols-2 lg:grid-cols-3">
@@ -245,16 +245,16 @@ export default function ProductList() {
                           p.stock > 0 ? "text-emerald-600" : "text-slate-400"
                         }`}
                       >
-                        {p.stock > 0 ? `${p.stock} in stock` : "Out of stock"}
+                        {p.stock > 0 ? `${p.stock} en stock` : "Agotado"}
                       </p>
                       <p className="text-[11px] text-slate-400">
-                        Category: {p.category} · Provider: {p.provider}
+                        Categoría: {p.category} · Proveedor: {p.provider}
                       </p>
                       <Button
                         onClick={() => handleAddToCart(p)}
                         className="mt-2 w-full rounded-full py-2 text-xs"
                       >
-                        Add to cart
+                        Añadir al carrito
                       </Button>
                     </div>
                   </div>

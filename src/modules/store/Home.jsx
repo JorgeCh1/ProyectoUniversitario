@@ -6,7 +6,7 @@ import cartService from "@/modules/store/services/cartService";
 
 export default function Home() {
   const collections = [
-    { name: "Black Friday", image: "/images/placeholder.png" },
+    { name: "Viernes Negro", image: "/images/placeholder.png" },
     { name: "Una nueva perspectiva", image: "/images/placeholder.png" },
     { name: "Mujeres", image: "/images/placeholder.png" },
   ];
@@ -65,7 +65,7 @@ export default function Home() {
     });
   };
 
-  const formatPrice = (price) => `$${price.toFixed(2)}`; //
+  const formatPrice = (price) => `₡${Number(price).toLocaleString("es-CR")}`;
 
   return (
     <div className="bg-white text-slate-900">
@@ -88,20 +88,20 @@ export default function Home() {
             `}
           >
             <p className="uppercase tracking-[0.2em] text-sm text-slate-100/80 ">
-              New collection
+              Nueva colección
             </p>
             <h1 className="text-4xl md:text-5xl font-semibold text-white leading-tight">
-              Maximum impact
+              Impacto máximo
             </h1>
             <p className="text-slate-100/90">
-              Shop our curated collection of looks, beautifully crafted in
-              seasonal neutrals.
+              Compra nuestra colección seleccionada de estilos, bellamente
+              elaborada en tonos neutros de temporada.
             </p>
             <Button
               onClick={handleHeroClick}
               className="mt-4 inline-flex rounded-full px-6 py-2 text-sm font-medium"
             >
-              Shop the looks
+              Ver los estilos
             </Button>
           </div>
         </div>
@@ -111,10 +111,10 @@ export default function Home() {
       <section className="max-w-7xl mx-auto px-4 py-12">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold tracking-tight">
-            Our Collections
+            Nuestras Colecciones
           </h2>
           <button className="text-sm text-slate-500 hover:text-slate-800 transition">
-            View all
+            Ver todas
           </button>
         </div>
 
@@ -138,7 +138,7 @@ export default function Home() {
               <div className="relative h-full flex flex-col justify-end p-5 text-white">
                 <h3 className="text-lg font-medium">{c.name}</h3>
                 <p className="text-xs uppercase tracking-[0.2em] text-slate-100/80">
-                  Shop now
+                  Compra ahora
                 </p>
               </div>
             </article>
@@ -173,14 +173,14 @@ export default function Home() {
         <div className="flex items-end justify-between mb-6">
           <div>
             <h2 className="text-xl font-semibold tracking-tight">
-              Featured products
+              Productos destacados
             </h2>
             <p className="text-sm text-slate-500">
-              Carefully selected pieces for this season.
+              Piezas cuidadosamente seleccionadas para esta temporada.
             </p>
           </div>
           <button className="text-sm text-brand-dark underline underline-offset-4 hover:text-brand transition">
-            Go to full store
+            Ir a la tienda completa
           </button>
         </div>
 
@@ -207,7 +207,7 @@ export default function Home() {
                   onClick={() => handleAddToBag(p)}
                   className="mt-2 w-full rounded-full py-2 text-xs"
                 >
-                  Add to bag
+                  Añadir a bolsa
                 </Button>
               </div>
             </article>
@@ -216,7 +216,7 @@ export default function Home() {
 
         {addedToBag && (
           <p className="mt-3 text-xs text-emerald-600">
-            Product added to your bag ✓
+            Producto añadido a tu bolsa ✓
           </p>
         )}
       </section>
@@ -226,41 +226,42 @@ export default function Home() {
         {/* About us */}
         <div className="space-y-4">
           <p className="text-xs uppercase tracking-[0.25em] text-slate-400">
-            About us
+            Sobre nosotros
           </p>
           <h2 className="text-2xl font-semibold tracking-tight">
-            The Elite Story
+            La Historia Elite
           </h2>
           <p className="text-sm text-slate-600">
-            A considered curation of classic, relaxed silhouettes crafted with
-            premium fabrics and functional details. Designed to move
-            effortlessly through every part of your day and every corner of the
-            world.
+            Una selección cuidadosa de siluetas clásicas y relajadas elaboradas
+            con telas premium y detalles funcionales. Diseñado para moverse sin
+            esfuerzo a través de cada parte de tu día y cada rincón del mundo.
           </p>
           <p className="text-sm text-slate-600">
-            From timeless basics to statement pieces, our collections are
-            created to mix, match and last beyond one season.
+            Desde lo básico atemporal hasta las piezas de declaración, nuestras
+            colecciones se crean para mezclar, combinar y perdurar más allá de
+            una temporada.
           </p>
           <button className="text-sm underline underline-offset-4 text-brand-dark hover:text-brand transition">
-            Learn more about us
+            Más información sobre nosotros
           </button>
         </div>
 
         {/* Our mission */}
         <div className="relative rounded-2xl overflow-hidden shadow-sm bg-brand-dark text-white p-8">
           <p className="text-xs uppercase tracking-[0.25em] text-slate-300 mb-2">
-            Our mission
+            Nuestra misión
           </p>
           <h3 className="text-xl font-semibold mb-3">
-            To empower women globally to celebrate summer with confidence.
+            Empoderar a las mujeres en todo el mundo para que celebren el verano
+            con confianza.
           </h3>
           <p className="text-sm text-slate-100/90 mb-4">
-            We design pieces that feel as good as they look: thoughtful fits,
-            sustainable fabrics and details that move with you from sunrise
-            swims to sunset gatherings.
+            Diseñamos piezas que se sienten tan bien como se ven: ajustes
+            reflexivos, telas sostenibles y detalles que se mueven contigo desde
+            los nados al amanecer hasta las reuniones al atardecer.
           </p>
           <p className="text-xs text-slate-300">
-            Designed with intention. Made to be lived in.
+            Diseñado con intención. Hecho para vivir en él.
           </p>
         </div>
       </section>
@@ -275,15 +276,17 @@ export default function Home() {
         <div className="relative h-full max-w-6xl mx-auto px-4 flex items-center">
           <div className="max-w-md space-y-3 text-white">
             <p className="text-xs uppercase tracking-[0.25em] text-slate-100/80">
-              New in
+              Novedades
             </p>
-            <h2 className="text-3xl font-semibold">Our high summer lookbook</h2>
+            <h2 className="text-3xl font-semibold">
+              Nuestro lookbook de verano
+            </h2>
             <p className="text-sm text-slate-100/90">
-              Discover the pieces styled together for the days that turn into
-              nights.
+              Descubre las piezas diseñadas juntas para los días que se
+              convierten en noches.
             </p>
             <Button className="inline-flex rounded-full px-6 py-2 text-sm font-medium">
-              Shop the edit
+              Ver la colección
             </Button>
           </div>
         </div>

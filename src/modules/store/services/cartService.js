@@ -34,6 +34,17 @@ function saveCartRaw(cart) {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    // Emit a global event so other parts of the app can react to cart changes
+    try {
+      const total = Array.isArray(cart.items)
+        ? cart.items.reduce((s, it) => s + (it.quantity || 0), 0)
+        : 0;
+      window.dispatchEvent(
+        new CustomEvent("cart:changed", { detail: { cart, total } })
+      );
+    } catch (_e) {
+      // non-fatal
+    }
   } catch (e) {
     console.error("Error guardando carrito:", e);
   }
@@ -86,6 +97,20 @@ const cartService = {
     }
 
     saveCartRaw({ ...cart, items });
+
+    // Emit a product:added-to-cart event so UI can show a confirmation dialog
+    try {
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("product:added-to-cart", {
+            detail: { product: newItem },
+          })
+        );
+      }
+    } catch (_e) {
+      // non-fatal
+    }
+
     return items;
   },
 

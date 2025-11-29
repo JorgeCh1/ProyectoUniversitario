@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import productService from "@/modules/store/services/productService";
 import { Button } from "@/components/ui/button";
 import cartService from "@/modules/store/services/cartService";
+import ProductDetailAddedDialog from "@/components/ProductDetailAddedDialog";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -447,6 +448,8 @@ export default function ProductDetail() {
           </div>
         </div>
       )}
+
+      <ProductDetailAddedDialog />
     </section>
   );
 }

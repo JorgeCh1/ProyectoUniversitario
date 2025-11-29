@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import productService from "@/modules/store/services/productService";
 import cartService from "@/modules/store/services/cartService";
+import CartAddedDialog from "@/components/CartAddedDialog";
 
 export default function ProductList() {
   const [heroVisible, setHeroVisible] = useState(false);
@@ -100,7 +101,9 @@ export default function ProductList() {
       <section className="relative h-[60vh] min-h-[400px] flex items-center">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/images/placeholder.png')" }}
+          style={{
+            backgroundImage: "url('/images/placeholder.png')",
+          }}
         />
         <div className="absolute inset-0 bg-black/40" />
 
@@ -156,39 +159,52 @@ export default function ProductList() {
       {/* MAIN CATALOG SECTION */}
       <section className="max-w-7xl mx-auto px-4 pb-16 flex flex-col md:flex-row gap-10">
         {/* SIDEBAR FILTROS */}
-        <aside className="w-full md:w-64 md:flex-shrink-0 space-y-8">
-          {/* Disponibilidad */}
+        <aside className="w-full md:w-64 md:flex-shrink-0 space-y-6 md:space-y-8 md:sticky md:top-24">
           <div>
-            <h3 className="text-sm font-semibold mb-2">Disponibilidad</h3>
+            <h2 className="text-sm font-semibold tracking-wide text-slate-500 uppercase mb-3">
+              Filtros
+            </h2>
+            <p className="text-xs text-slate-400">
+              Refina tu búsqueda y encuentra más rápido tus prendas favoritas.
+            </p>
+          </div>
+
+          {/* Disponibilidad */}
+          <div className="border border-slate-200 rounded-lg p-4 bg-white/60">
+            <h3 className="text-sm font-semibold mb-2 text-slate-800">
+              Disponibilidad
+            </h3>
             <div className="space-y-1 text-sm text-slate-700">
-              <label className="flex items-center gap-2">
+              <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={showInStockOnly}
                   onChange={(e) => setShowInStockOnly(e.target.checked)}
                   className="rounded border-slate-300"
                 />
-                <span>En stock</span>
+                <span>Mostrar solo productos en stock</span>
               </label>
               <p className="text-xs text-slate-400 pl-6">
-                (Agotado se mostrará solo si desmarcan este filtro)
+                Desmarca esta opción para incluir artículos agotados.
               </p>
             </div>
           </div>
 
           {/* Categoría */}
-          <div>
-            <h3 className="text-sm font-semibold mb-2">Tipo de producto</h3>
+          <div className="border border-slate-200 rounded-lg p-4 bg-white/60">
+            <h3 className="text-sm font-semibold mb-2 text-slate-800">
+              Tipo de producto
+            </h3>
             <div className="space-y-1 text-sm text-slate-700">
               {categories.map((cat) => (
                 <button
                   key={cat}
                   type="button"
                   onClick={() => setSelectedCategory(cat)}
-                  className={`block w-full text-left px-2 py-1 rounded ${
+                  className={`block w-full text-left px-3 py-1.5 rounded-full border text-xs md:text-sm transition ${
                     selectedCategory === cat
-                      ? "bg-slate-900 text-white"
-                      : "hover:bg-slate-100"
+                      ? "bg-slate-900 text-white border-slate-900"
+                      : "bg-white hover:bg-slate-100 border-slate-200"
                   }`}
                 >
                   {cat === "all" ? "Todos los productos" : cat}
@@ -196,8 +212,6 @@ export default function ProductList() {
               ))}
             </div>
           </div>
-
-          {/* (Opcional) otros filtros visuales: color, size, sort, etc. */}
         </aside>
 
         {/* GRID DE PRODUCTOS */}
@@ -264,6 +278,8 @@ export default function ProductList() {
           )}
         </div>
       </section>
+
+      <CartAddedDialog />
     </div>
   );
 }

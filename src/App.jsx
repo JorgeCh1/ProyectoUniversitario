@@ -10,6 +10,10 @@ import Checkout from "./modules/store/Checkout.jsx";
 
 // ADMIN
 import AdminMain from "./modules/admin/AdminMain.jsx";
+// AUTH
+import Login from "./modules/auth/Login.jsx";
+import Register from "./modules/auth/Register.jsx";
+import Profile from "./modules/auth/Profile.jsx";
 
 import { Routes, Route } from "react-router-dom";
 
@@ -29,6 +33,11 @@ function App() {
 
           {/* Admin */}
           <Route path="/admin/*" element={<AdminMain />} />
+
+          {/* Auth */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/registro" element={<Register />} />
+          <Route path="/cuenta" element={<Profile />} />
         </Routes>
       </main>
 

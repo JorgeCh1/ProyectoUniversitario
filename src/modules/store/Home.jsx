@@ -3,11 +3,15 @@ import { Button } from "@/components/ui/button";
 import productService from "@/modules/store/services/productService";
 import { Link } from "react-router-dom";
 import cartService from "@/modules/store/services/cartService";
+import CartAddedDialog from "@/components/CartAddedDialog";
 
 export default function Home() {
   const collections = [
     { name: "Viernes Negro", image: "/images/placeholder.png" },
-    { name: "Una nueva perspectiva", image: "/images/placeholder.png" },
+    {
+      name: "Una nueva perspectiva",
+      image: "/images/placeholder.png",
+    },
     { name: "Mujeres", image: "/images/placeholder.png" },
   ];
 
@@ -73,7 +77,9 @@ export default function Home() {
       <section className="relative h-[90vh] min-h-[600px] flex items-center justify-center text-center">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/images/placeholder.png')" }}
+          style={{
+            backgroundImage: "url('/images/placeholder.png')",
+          }}
         />
         <div className="absolute inset-0 bg-black/40" />
 
@@ -229,20 +235,21 @@ export default function Home() {
             Sobre nosotros
           </p>
           <h2 className="text-2xl font-semibold tracking-tight">
-            La Historia Elite
+            La historia de Bellas Boutique
           </h2>
           <p className="text-sm text-slate-600">
-            Una selección cuidadosa de siluetas clásicas y relajadas elaboradas
-            con telas premium y detalles funcionales. Diseñado para moverse sin
-            esfuerzo a través de cada parte de tu día y cada rincón del mundo.
+            Bellas Boutique nace con la idea de ofrecer una experiencia de moda
+            cálida, cercana y accesible, reuniendo en un solo lugar ropa,
+            calzado y accesorios que realzan el estilo personal de cada cliente.
           </p>
           <p className="text-sm text-slate-600">
-            Desde lo básico atemporal hasta las piezas de declaración, nuestras
-            colecciones se crean para mezclar, combinar y perdurar más allá de
-            una temporada.
+            Cuidamos cada detalle: desde la selección de las prendas hasta la
+            forma en que las presentaremos en nuestra tienda en línea, para que
+            puedas combinar, crear outfits y sentirte segura al comprar desde
+            cualquier lugar.
           </p>
           <button className="text-sm underline underline-offset-4 text-brand-dark hover:text-brand transition">
-            Más información sobre nosotros
+            Más información sobre Bellas Boutique
           </button>
         </div>
 
@@ -252,16 +259,16 @@ export default function Home() {
             Nuestra misión
           </p>
           <h3 className="text-xl font-semibold mb-3">
-            Empoderar a las mujeres en todo el mundo para que celebren el verano
-            con confianza.
+            Hacer que cada persona se sienta bella, cómoda y segura al vestir.
           </h3>
           <p className="text-sm text-slate-100/90 mb-4">
-            Diseñamos piezas que se sienten tan bien como se ven: ajustes
-            reflexivos, telas sostenibles y detalles que se mueven contigo desde
-            los nados al amanecer hasta las reuniones al atardecer.
+            Creamos una experiencia de compra moderna y confiable, combinando
+            moda, tecnología y un servicio cercano. Nuestro objetivo es que tu
+            proceso de elegir, comprar y recibir tus prendas sea tan agradable
+            como usarlas.
           </p>
           <p className="text-xs text-slate-300">
-            Diseñado con intención. Hecho para vivir en él.
+            Moda con intención. Compras seguras. Estilo para el día a día.
           </p>
         </div>
       </section>
@@ -270,7 +277,9 @@ export default function Home() {
       <section className="relative h-[60vh] min-h-[400px] mt-8 overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center scale-105"
-          style={{ backgroundImage: "url('/images/placeholder.png')" }}
+          style={{
+            backgroundImage: "url('/images/placeholder.png')",
+          }}
         />
         <div className="absolute inset-0 bg-black/40" />
         <div className="relative h-full max-w-6xl mx-auto px-4 flex items-center">
@@ -291,6 +300,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <CartAddedDialog />
     </div>
   );
 }

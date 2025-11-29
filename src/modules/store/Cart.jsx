@@ -1,15 +1,42 @@
-// src/modules/store/Cart.jsx
+// Página del carrito de compras
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import cartService from "@/modules/store/services/cartService";
 import { Button } from "@/components/ui/button";
 
 export default function Cart() {
+  const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [meta, setMeta] = useState({ userId: "guest", createdAt: "" });
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
+    // Cargar carrito y usuario del almacenamiento
     setItems(cartService.getCart());
     setMeta(cartService.getCartMeta());
+    try {
+      const user = JSON.parse(localStorage.getItem("currentUser") || "null");
+      setCurrentUser(user);
+    } catch (_) {
+      // ignorar errores de parseo
+      setCurrentUser(null);
+    }
+    // Escuchar cambios de autenticación para actualizar usuario
+    function onAuthChanged(e) {
+      try {
+        const user =
+          e && e.detail
+            ? e.detail.user
+            : JSON.parse(localStorage.getItem("currentUser") || "null");
+        setCurrentUser(user);
+      } catch (_) {
+        // ignorar errores
+        setCurrentUser(null);
+      }
+    }
+
+    window.addEventListener("auth:changed", onAuthChanged);
+    return () => window.removeEventListener("auth:changed", onAuthChanged);
   }, []);
 
   const createdAtLabel = meta.createdAt
@@ -55,6 +82,12 @@ export default function Cart() {
       <h1 className="text-center text-2xl md:text-3xl font-semibold tracking-tight mb-8">
         Carrito de compras
       </h1>
+
+      {currentUser && (
+        <p className="text-center text-sm text-brand-dark font-medium mb-4">
+          Bienvenido, {currentUser.nombre}
+        </p>
+      )}
 
       <p className="text-center text-[11px] text-slate-500 mb-6">
         Carrito para usuario: <span className="font-medium">{meta.userId}</span>{" "}
@@ -188,9 +221,12 @@ export default function Cart() {
           </p>
 
           <div className="flex justify-center">
-            <Button className="rounded-full px-10 py-2 text-sm bg-[#d3a8ff] hover:bg-[#c995ff] text-white">
-              Pagar
-            </Button>
+            <button
+              onClick={() => navigate("/checkout")}
+              className="rounded-full px-10 py-2 text-sm bg-brand-dark text-white hover:bg-brand font-medium transition-colors"
+            >
+              Proceder al Checkout
+            </button>
           </div>
         </>
       )}

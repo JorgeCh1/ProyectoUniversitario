@@ -28,6 +28,7 @@ function ensureDefaultUser() {
       direccion: "N/A",
       rol: "Administrador",
       password: "123456",
+      estado: "Activo",
     };
     users.push(defaultUser);
     saveUsers(users);
@@ -43,10 +44,10 @@ export function login({ email, password }) {
     (u) => u.email === email.trim() && u.password === password
   );
 
-  if (!user) {
+  if (user.estado && user.estado !== "Activo") {
     return {
       success: false,
-      error: "Correo o contraseña incorrectos.",
+      error: "Tu cuenta está inactiva o suspendida. Contacta al administrador.",
     };
   }
 
@@ -96,6 +97,7 @@ export function registerUser({
     direccion,
     rol: rol || "Cliente",
     password: passwordRegistro,
+    estado: "Activo", //
   };
 
   users.push(newUser);
@@ -128,5 +130,47 @@ export function resetPassword(email) {
     success: true,
     message: "Contraseña restablecida correctamente",
     newPassword,
+  };
+}
+
+// ---------- HELPERS PARA ADMIN ----------
+
+// Lista cruda de usuarios tal como se guardan en localStorage
+export function listUsersRaw() {
+  return getUsers();
+}
+
+// Actualizar un usuario desde el panel admin, mapeando por idUser
+export function updateUserFromAdmin(adminUser) {
+  const users = getUsers();
+
+  // En el admin usamos "id", en storage es "idUser"
+  const index = users.findIndex((u) => u.idUser === adminUser.id);
+
+  if (index === -1) {
+    return {
+      success: false,
+      message: "Usuario no encontrado en almacenamiento.",
+    };
+  }
+
+  const existing = users[index];
+
+  // Preservamos cedula, password, idUser, etc.
+  users[index] = {
+    ...existing,
+    nombre: adminUser.nombre,
+    apellidos: adminUser.apellidos,
+    telefono: adminUser.telefono,
+    direccion: adminUser.direccion,
+    rol: adminUser.rol,
+    estado: adminUser.estado,
+  };
+
+  saveUsers(users);
+
+  return {
+    success: true,
+    user: users[index],
   };
 }

@@ -1,6 +1,9 @@
 // src/modules/store/services/productService.js
 
-const products = [
+const STORAGE_KEY = "products";
+
+// Productos "demo" por si quieres sembrar algo la PRIMERA vez
+const seedProducts = [
   {
     id: 1,
     name: "Vestido Midi Lila Encaje",
@@ -91,15 +94,84 @@ const products = [
   },
 ];
 
+function loadFromStorage() {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return null;
+    return parsed;
+  } catch (e) {
+    console.error("Error leyendo productos desde localStorage:", e);
+    return null;
+  }
+}
+
+function saveToStorage(list) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  } catch (e) {
+    console.error("Error guardando productos en localStorage:", e);
+  }
+}
+
 const productService = {
+  // Lee SIEMPRE de localStorage; si está vacío, usa semilla
   list: async () => {
+    const stored = loadFromStorage();
+    if (stored && stored.length > 0) return stored;
+
+    // si nunca se ha guardado nada, sembramos la semilla
+    saveToStorage(seedProducts);
+    return seedProducts;
+  },
+
+  listFeatured: async (limit = 8) => {
+    const all = await productService.list();
+    return all.slice(0, limit);
+  },
+
+  getById: async (id) => {
+    const all = await productService.list();
+    return all.find((p) => String(p.id) === String(id)) ?? null;
+  },
+
+  // para que el admin pueda sobrescribir el catálogo
+  saveAll: async (products) => {
+    saveToStorage(products);
     return products;
   },
-  listFeatured: async (limit = 8) => {
-    return products.slice(0, limit);
-  },
-  getById: async (id) => {
-    return products.find((p) => p.id === Number(id)) ?? null;
+
+  // Descontar stock según los ítems del carrito
+  updateStockAfterSale: async (cartItems) => {
+    if (!Array.isArray(cartItems) || cartItems.length === 0) {
+      return;
+    }
+
+    const products = await productService.list();
+
+    // Hacemos una copia para no mutar directamente
+    const updatedProducts = products.map((p) => {
+      // Sumamos todas las cantidades de este producto en el carrito
+      const totalQtyForProduct = cartItems
+        .filter((item) => String(item.id) === String(p.id))
+        .reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+
+      if (!totalQtyForProduct) return p;
+
+      const currentStock = Number(p.stock) || 0;
+      const newStock = currentStock - totalQtyForProduct;
+
+      return {
+        ...p,
+        stock: newStock >= 0 ? newStock : 0, // nunca menos de 0
+      };
+    });
+
+    saveToStorage(updatedProducts);
+    return updatedProducts;
   },
 };
 

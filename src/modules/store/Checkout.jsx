@@ -3,6 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import cartService from "@/modules/store/services/cartService";
 import { Button } from "@/components/ui/button";
+import productService from "@/modules/store/services/productService";
+import salesService from "@/modules/admin/services/SalesService";
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -87,7 +89,7 @@ export default function Checkout() {
     !country ||
     !address.trim();
 
-  const handleConfirmPayment = () => {
+  const handleConfirmPayment = async () => {
     setSubmitted(true);
     if (hasErrors || items.length === 0) return;
 
@@ -131,6 +133,37 @@ export default function Checkout() {
 
     setPaymentStatus("SUCCESS");
 
+    // 1) Guardar venta para el panel admin
+    try {
+      salesService.addFromInvoice(invoice);
+    } catch (e) {
+      console.error("Error guardando venta:", e);
+    }
+
+    // 2) Actualizar stock de productos
+    (async () => {
+      try {
+        const allProducts = await productService.list();
+        const updatedProducts = allProducts.map((p) => {
+          const line = invoice.products.find(
+            (it) => String(it.productId) === String(p.id)
+          );
+          if (!line) return p;
+
+          const currentStock = Number(p.stock || 0);
+          const qty = Number(line.quantity || 0);
+
+          return {
+            ...p,
+            stock: Math.max(0, currentStock - qty),
+          };
+        });
+
+        await productService.saveAll(updatedProducts);
+      } catch (e) {
+        console.error("Error actualizando stock:", e);
+      }
+    })();
     // Simulación: después de 1.5s redirige a home
     setTimeout(() => {
       cartService.clearCart();

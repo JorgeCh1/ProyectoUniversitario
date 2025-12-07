@@ -2,176 +2,267 @@
 
 const STORAGE_KEY = "products";
 
-// Productos "demo" por si quieres sembrar algo la PRIMERA vez
-const seedProducts = [
+// Por si no hay nada en storage todavía
+const SEED_PRODUCTS = [
+  // ZAPATOS
   {
-    id: 1,
-    name: "Vestido Midi Lila Encaje",
-    description:
-      "Vestido midi en tono lila con detalle de encaje en el busto y falda vaporosa. Ideal para eventos de día o noche.",
-    price: 38900,
-    stock: 6,
-    category: "Ropa",
-    provider: "Bellas Boutique",
-    image: "/images/placeholder.png",
+    id: "P001",
+    nombre: "Sandalias de Tacón Minimalistas Nude",
+    descripcion: "Sandalias elegantes de tacón bajo estilo minimalista.",
+    precio: 35000,
+    stock: 20,
+    categoria: "Zapato",
+    proveedor: "Proveedor Zapatos",
+    imagenes: [
+      "/images/products/bellas-boutique-products-020.webp",
+      "/images/products/bellas-boutique-products-021.webp",
+      "/images/products/bellas-boutique-products-022.webp",
+      "/images/products/bellas-boutique-products-021.webp",
+    ],
+    estado: "Activo",
   },
   {
-    id: 2,
-    name: "Blusa Satinada Hombros Descubiertos",
-    description:
-      "Blusa satinada de hombros descubiertos, corte relajado y caída suave, perfecta para combinar con jeans o faldas.",
-    price: 21500,
-    stock: 10,
-    category: "Ropa",
-    provider: "Colección Bellas",
-    image: "/images/placeholder.png",
+    id: "P002",
+    nombre: "Tenis Urbanos Blancos Plataforma",
+    descripcion: "Tenis urbanos con plataforma y acabado blanco.",
+    precio: 42000,
+    stock: 30,
+    categoria: "Zapato",
+    proveedor: "Proveedor Zapatos",
+    // si quieres, luego le pones sus 4 imágenes
+    imagenes: [
+      "/images/products/bellas-boutique-products-026.webp",
+      "/images/products/bellas-boutique-products-018.webp",
+      "/images/products/bellas-boutique-products-019.webp",
+      "/images/products/bellas-boutique-products-026.webp",
+    ],
+    estado: "Activo",
   },
   {
-    id: 3,
-    name: "Jeans Mom Fit Azul Clásico",
-    description:
-      "Jeans mom fit tiro alto en color azul clásico, tela resistente y cómoda, favorece la silueta.",
-    price: 29500,
-    stock: 7,
-    category: "Ropa",
-    provider: "Bellas Boutique",
-    image: "/images/placeholder.png",
-  },
-  {
-    id: 4,
-    name: "Sandalias de Tacón Nude Correa Fina",
-    description:
-      "Sandalias de tacón medio en color nude con correa fina al tobillo. Combinan con cualquier outfit elegante.",
-    price: 32900,
-    stock: 4,
-    category: "Calzado",
-    provider: "Bellas Boutique",
-    image: "/images/placeholder.png",
-  },
-  {
-    id: 5,
-    name: "Tenis Blancos Plataforma Urbana",
-    description:
-      "Tenis blancos con plataforma ligera, estilo urbano y cómodo para el día a día.",
-    price: 28900,
-    stock: 5,
-    category: "Calzado",
-    provider: "Urban Bellas",
-    image: "/images/placeholder.png",
-  },
-  {
-    id: 6,
-    name: "Bolso Cruzado Lavanda Minimal",
-    description:
-      "Bolso cruzado en tono lavanda con diseño minimalista, compartimentos internos y correa ajustable.",
-    price: 24900,
-    stock: 8,
-    category: "Accesorios",
-    provider: "Bellas Boutique",
-    image: "/images/placeholder.png",
-  },
-  {
-    id: 7,
-    name: "Collar Doble Dorado con Dije",
-    description:
-      "Collar doble en acabado dorado con dije delicado. Aporta un toque elegante a cualquier look.",
-    price: 13500,
-    stock: 12,
-    category: "Accesorios",
-    provider: "Colección Bellas",
-    image: "/images/placeholder.png",
-  },
-  {
-    id: 8,
-    name: "Set Scrunchies Satinados Pastel (x3)",
-    description:
-      "Set de tres scrunchies satinados en tonos pastel, ideales para complementar tus peinados.",
-    price: 7500,
+    id: "P003",
+    nombre: "Botines Negros de Cuero Premium",
+    descripcion: "Botines de cuero genuino estilo premium.",
+    precio: 80000,
     stock: 15,
-    category: "Accesorios",
-    provider: "Bellas Boutique",
-    image: "/images/placeholder.png",
+    categoria: "Zapato",
+    proveedor: "Proveedor Zapatos",
+    imagenes: [
+      "/images/products/bellas-boutique-products-017.webp",
+      "/images/products/bellas-boutique-products-024.webp",
+      "/images/products/bellas-boutique-products-023.webp",
+      "/images/products/bellas-boutique-products-025.webp",
+    ],
+    estado: "Activo",
+  },
+
+  // ROPA
+  {
+    id: "P004",
+    nombre: "Vestido Midi Floral Primavera",
+    descripcion: "Vestido de corte midi con estampado floral.",
+    precio: 55000,
+    stock: 25,
+    categoria: "Ropa",
+    proveedor: "Proveedor Ropa",
+    imagenes: [
+      "/images/products/bellas-boutique-products-014.webp",
+      "/images/products/bellas-boutique-products-016.webp",
+      "/images/products/bellas-boutique-products-027.webp",
+      "/images/products/bellas-boutique-products-015.webp",
+    ],
+    estado: "Activo",
+  },
+  {
+    id: "P005",
+    nombre: "Blusa Satinada Manga Globo",
+    descripcion: "Blusa satinada elegante con mangas tipo globo.",
+    precio: 30000,
+    stock: 40,
+    categoria: "Ropa",
+    proveedor: "Proveedor Ropa",
+    imagenes: [
+      "/images/products/bellas-boutique-products-006.webp",
+      "/images/products/bellas-boutique-products-002.webp",
+      "/images/products/bellas-boutique-products-012.webp",
+      "/images/products/bellas-boutique-products-002.webp",
+    ],
+    estado: "Activo",
+  },
+  {
+    id: "P006",
+    nombre: "Pantalón Palazzo Beige Elegante",
+    descripcion: "Pantalón palazzo beige de tela suave y elegante.",
+    precio: 32000,
+    stock: 35,
+    categoria: "Ropa",
+    proveedor: "Proveedor Ropa",
+    imagenes: [
+      "/images/products/bellas-boutique-products-029.webp",
+      "/images/products/bellas-boutique-products-013.webp",
+      "/images/products/bellas-boutique-products-007.webp",
+      "/images/products/bellas-boutique-products-001.webp",
+    ],
+    estado: "Activo",
+  },
+
+  // JOYERÍA
+  {
+    id: "P007",
+    nombre: "Collar Dorado Minimalista con Dije",
+    descripcion: "Collar delgado dorado con dije minimalista.",
+    precio: 18000,
+    stock: 50,
+    categoria: "Joyería",
+    proveedor: "Proveedor Joyería",
+    imagenes: [
+      "/images/products/bellas-boutique-products-008.webp",
+      "/images/products/bellas-boutique-products-011.webp",
+      "/images/products/bellas-boutique-products-005.webp",
+      "/images/products/bellas-boutique-products-009.webp",
+    ],
+    estado: "Activo",
+  },
+  {
+    id: "P008",
+    nombre: "Aretes Aro Plata 925 Premium",
+    descripcion: "Aretes tipo aro fabricados en plata 925.",
+    precio: 25000,
+    stock: 45,
+    categoria: "Joyería",
+    proveedor: "Proveedor Joyería",
+    imagenes: [
+      "/images/products/bellas-boutique-products-010.webp",
+      "/images/products/bellas-boutique-products-028.webp",
+      "/images/products/bellas-boutique-products-004.webp",
+      "/images/products/bellas-boutique-products-003.webp",
+    ],
+    estado: "Activo",
   },
 ];
 
 function loadFromStorage() {
-  if (typeof window === "undefined") return null;
+  if (typeof window === "undefined") return SEED_PRODUCTS;
+
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
+    const raw = localStorage.getItem(STORAGE_KEY);
+
+    // Si no existe nada en el storage, sembrar la semilla
+    if (!raw) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_PRODUCTS));
+      return SEED_PRODUCTS;
+    }
+
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return null;
+
+    // Si por error se guardó otra cosa, resembrar
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_PRODUCTS));
+      return SEED_PRODUCTS;
+    }
+
     return parsed;
   } catch (e) {
-    console.error("Error leyendo productos desde localStorage:", e);
-    return null;
+    console.error("Error leyendo productos. Reseteando catálogo:", e);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_PRODUCTS));
+    return SEED_PRODUCTS;
   }
 }
 
 function saveToStorage(list) {
   if (typeof window === "undefined") return;
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
   } catch (e) {
-    console.error("Error guardando productos en localStorage:", e);
+    console.error("Error guardando productos:", e);
   }
 }
 
-const productService = {
-  // Lee SIEMPRE de localStorage; si está vacío, usa semilla
-  list: async () => {
-    const stored = loadFromStorage();
-    if (stored && stored.length > 0) return stored;
+/**
+ * Normaliza un producto del storage (español)
+ * al formato que espera el frontend (inglés).
+ */
+function normalizeProduct(p) {
+  const images =
+  p.images ??
+  p.imagenes ??
+  (p.imagen && p.imagen.trim()
+    ? [p.imagen.trim()]
+    : p.image && p.image.trim()
+      ? [p.image.trim()]
+      : []);
 
-    // si nunca se ha guardado nada, sembramos la semilla
-    saveToStorage(seedProducts);
-    return seedProducts;
+
+  return {
+  id: p.id,
+  name: p.name ?? p.nombre ?? "",
+  description: p.description ?? p.descripcion ?? "",
+  price: p.price ?? p.precio ?? 0,
+  stock: p.stock ?? 0,
+  category: p.category ?? p.categoria ?? "",
+  provider: p.provider ?? p.proveedor ?? "",
+  images,
+  image: p.image ?? p.imagen ?? images[0] ?? "",
+  status: p.status ?? p.estado ?? "Activo",
+  colors: p.colors ?? [],
+  sizes: p.sizes ?? [],
+  raw: p,
+};
+
+}
+
+const productService = {
+  // Siempre regresa al menos la semilla, pero NORMALIZADA
+  list: async () => {
+    const raw = loadFromStorage();
+    return raw.map(normalizeProduct);
   },
 
   listFeatured: async (limit = 8) => {
-    const all = await productService.list();
-    return all.slice(0, limit);
+    const raw = loadFromStorage();
+    return raw.slice(0, limit).map(normalizeProduct);
   },
 
   getById: async (id) => {
-    const all = await productService.list();
-    return all.find((p) => String(p.id) === String(id)) ?? null;
+    const raw = loadFromStorage();
+    const found =
+      raw.find((p) => String(p.id) === String(id)) ??
+      null;
+    return found ? normalizeProduct(found) : null;
   },
 
-  // para que el admin pueda sobrescribir el catálogo
+  // Guardar catálogo completo (para Admin)
   saveAll: async (products) => {
+    // aquí guardamos "crudo" como venga del admin
     saveToStorage(products);
-    return products;
+    return products.map(normalizeProduct);
   },
 
-  // Descontar stock según los ítems del carrito
+  // Restar stock cuando se realiza una compra
   updateStockAfterSale: async (cartItems) => {
-    if (!Array.isArray(cartItems) || cartItems.length === 0) {
-      return;
-    }
+    if (!Array.isArray(cartItems) || cartItems.length === 0) return;
 
-    const products = await productService.list();
+    const products = loadFromStorage();
 
-    // Hacemos una copia para no mutar directamente
-    const updatedProducts = products.map((p) => {
-      // Sumamos todas las cantidades de este producto en el carrito
-      const totalQtyForProduct = cartItems
+    const updated = products.map((p) => {
+      // cantidad total comprada de este producto
+      const qty = cartItems
         .filter((item) => String(item.id) === String(p.id))
-        .reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+        .reduce((sum, item) => sum + Number(item.quantity || 0), 0);
 
-      if (!totalQtyForProduct) return p;
+      if (!qty) return p;
 
-      const currentStock = Number(p.stock) || 0;
-      const newStock = currentStock - totalQtyForProduct;
+      const newStock = Math.max(0, Number(p.stock) - qty);
 
       return {
         ...p,
-        stock: newStock >= 0 ? newStock : 0, // nunca menos de 0
+        stock: newStock,
       };
     });
 
-    saveToStorage(updatedProducts);
-    return updatedProducts;
+    saveToStorage(updated);
+
+    // devolvemos normalizados
+    return updated.map(normalizeProduct);
   },
 };
 

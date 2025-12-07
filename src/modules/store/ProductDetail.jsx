@@ -5,6 +5,15 @@ import { Button } from "@/components/ui/button";
 import cartService from "@/modules/store/services/cartService";
 import ProductDetailAddedDialog from "@/components/ProductDetailAddedDialog";
 
+// arriba del componente ProductDetail
+
+const SIZE_PRESETS = {
+  Ropa: ["XS", "S", "M", "L", "XL"],
+  Zapato: ["35", "36", "37", "38", "39", "40"],
+  "Joyería": [], // normalmente sin talla
+};
+
+
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -13,7 +22,6 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
   const [quantity, setQuantity] = useState(1);
 
@@ -28,6 +36,9 @@ export default function ProductDetail() {
     setActiveSlide(0);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  const getMainImage = (p) =>
+    p?.images?.[0] || p?.imagen || p?.image || "/images/placeholder.png";
 
   // Cargar producto
   useEffect(() => {
@@ -55,7 +66,6 @@ export default function ProductDetail() {
             setError("Producto no encontrado.");
           } else {
             setProduct(data);
-            if (data.colors?.length) setSelectedColor(data.colors[0]);
             if (data.sizes?.length) setSelectedSize(data.sizes[0]);
             loadRelated(data.id);
           }
@@ -76,14 +86,31 @@ export default function ProductDetail() {
 
   const images = useMemo(() => {
     if (!product) return [];
-    if (product.images?.length) return product.images;
+    if (product.imagenes?.length) return product.imagenes;
+    if (product.images?.length) return product.images; // fallback
     const base = product.image || "/images/placeholder.png";
     return [base, base, base, base];
   }, [product]);
 
   const stock = product?.stock ?? 0;
-  const colors = product?.colors ?? ["Vermont"];
-  const sizes = product?.sizes ?? ["4", "6", "8", "10", "12"];
+  const sizes = useMemo(() => {
+  if (!product) return [];
+
+  // Si el producto ya trae tallas desde el admin / storage
+  if (Array.isArray(product.sizes) && product.sizes.length > 0) {
+    return product.sizes;
+  }
+
+  // Si no trae, usamos los presets según categoría
+  const cat = product.category || product.categoria || "";
+  if (SIZE_PRESETS[cat]) {
+    return SIZE_PRESETS[cat];
+  }
+
+  // Categorías que no manejan talla (joyería, accesorios, etc.)
+  return [];
+}, [product]);
+
 
   const priceLabel = product
     ? `₡${Number(product.price).toLocaleString("es-CR")}`
@@ -94,15 +121,13 @@ export default function ProductDetail() {
   const handleAddToCart = () => {
     if (!product) return;
 
-    const color = selectedColor || (product.colors?.[0] ?? null);
     const size = selectedSize || (product.sizes?.[0] ?? null);
 
     const updated = cartService.addItem({
       id: product.id,
       name: product.name,
       price: product.price,
-      image: product.image,
-      color,
+      image: getMainImage(product),
       size,
       quantity,
     });
@@ -150,20 +175,40 @@ export default function ProductDetail() {
       {/* LAYOUT PRINCIPAL */}
       <div className="grid gap-10 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         {/* COLLAGE DE IMÁGENES */}
-        <div className="grid gap-4 md:grid-cols-2">
-          {images.slice(0, 4).map((src, idx) => (
-            <div
-              key={idx}
-              className="aspect-[4/5] overflow-hidden rounded-xl bg-slate-100"
-            >
-              <img
-                src={src}
-                alt={product.name}
-                className="h-full w-full object-cover"
-              />
+        <>
+          {/* Mobile: slider deslizable */}
+          <div className="md:hidden">
+            <div className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth">
+              {images.slice(0, 4).map((src, idx) => (
+                <div key={idx} className="min-w-full snap-center px-1">
+                  <div className="aspect-[4/5] overflow-hidden rounded-xl bg-slate-100">
+                    <img
+                      src={src}
+                      alt={product.name}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+
+          {/* Desktop / tablet: tu grid original */}
+          <div className="hidden md:grid gap-4 md:grid-cols-2">
+            {images.slice(0, 4).map((src, idx) => (
+              <div
+                key={idx}
+                className="aspect-[4/5] overflow-hidden rounded-xl bg-slate-100"
+              >
+                <img
+                  src={src}
+                  alt={product.name}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            ))}
+          </div>
+        </>
 
         {/* PANEL DERECHO */}
         <div className="space-y-6">
@@ -191,57 +236,31 @@ export default function ProductDetail() {
             </p>
           </div>
 
-          {/* Color (solo si manejas colores) */}
-          <div className="space-y-2">
-            <p className="text-xs font-medium text-slate-700 uppercase tracking-[0.18em]">
-              Color
-            </p>
-            <p className="text-sm text-slate-700">
-              {selectedColor || colors[0]}
-            </p>
+          {/* Size (solo si hay tallas) */}
+{sizes.length > 0 && (
+  <div className="space-y-2">
+    <p className="text-xs font-medium text-slate-700 uppercase tracking-[0.18em]">
+      Talla
+    </p>
+    <div className="flex flex-wrap gap-2">
+      {sizes.map((s) => (
+        <button
+          key={s}
+          type="button"
+          onClick={() => setSelectedSize(s)}
+          className={`h-9 w-9 text-xs flex items-center justify-center rounded-full border ${
+            selectedSize === s
+              ? "border-slate-900 bg-slate-900 text-white"
+              : "border-slate-300 text-slate-700 hover:border-slate-900"
+          }`}
+        >
+          {s}
+        </button>
+      ))}
+    </div>
+  </div>
+)}
 
-            <div className="flex gap-2 mt-1">
-              {colors.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setSelectedColor(c)}
-                  className={`h-12 w-12 overflow-hidden rounded-md border-2 ${
-                    selectedColor === c
-                      ? "border-slate-900"
-                      : "border-slate-200"
-                  }`}
-                >
-                  <span className="flex h-full w-full items-center justify-center text-[10px] text-slate-600 bg-slate-50">
-                    {c}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Size (también opcional hasta que lo conectes al admin) */}
-          <div className="space-y-2">
-            <p className="text-xs font-medium text-slate-700 uppercase tracking-[0.18em]">
-              Talla
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {sizes.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => setSelectedSize(s)}
-                  className={`h-9 w-9 text-xs flex items-center justify-center rounded-full border ${
-                    selectedSize === s
-                      ? "border-slate-900 bg-slate-900 text-white"
-                      : "border-slate-300 text-slate-700 hover:border-slate-900"
-                  }`}
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          </div>
 
           {/* Cantidad + botones */}
           <div className="flex items-center gap-4">
@@ -382,68 +401,102 @@ export default function ProductDetail() {
           </h2>
 
           <div className="relative">
-            <div className="overflow-hidden">
-              <div
-                className="flex transition-transform duration-500"
-                style={{ transform: `translateX(-${activeSlide * 100}%)` }}
-              >
-                {Array.from({ length: totalSlides }).map((_, slideIndex) => {
-                  const start = slideIndex * itemsPerSlide;
-                  const end = start + itemsPerSlide;
-                  const slice = relatedProducts.slice(start, end);
-
-                  return (
-                    <div
-                      key={slideIndex}
-                      className="grid shrink-0 w-full grid-cols-2 md:grid-cols-4 gap-6"
-                    >
-                      {slice.map((p) => (
-                        <article
-                          key={p.id}
-                          role="button"
-                          onClick={() => handleRelatedClick(p.id)}
-                          className="cursor-pointer bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
-                        >
-                          <div className="aspect-[3/4] bg-slate-100">
-                            <img
-                              src={p.image || "/images/placeholder.png"}
-                              alt={p.name}
-                              className="h-full w-full object-cover"
-                            />
-                          </div>
-                          <div className="p-3 space-y-1">
-                            <h3 className="text-sm font-medium text-slate-900 line-clamp-1">
-                              {p.name}
-                            </h3>
-                            <p className="text-xs text-slate-500">
-                              {p.provider}
-                            </p>
-                            <p className="text-sm text-slate-700">
-                              £{Number(p.price).toFixed(2)}
-                            </p>
-                          </div>
-                        </article>
-                      ))}
+            {/* MOBILE: slider deslizable por scroll */}
+            <div className="md:hidden">
+              <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-1">
+                {relatedProducts.map((p) => (
+                  <article
+                    key={p.id}
+                    role="button"
+                    onClick={() => handleRelatedClick(p.id)}
+                    className="snap-center min-w-[70%] cursor-pointer bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
+                  >
+                    <div className="aspect-[3/4] bg-slate-100">
+                      <img
+                        src={getMainImage(p)}
+                        alt={p.name}
+                        className="h-full w-full object-cover"
+                      />
                     </div>
-                  );
-                })}
+                    <div className="p-3 space-y-1">
+                      <h3 className="text-sm font-medium text-slate-900 line-clamp-1">
+                        {p.name}
+                      </h3>
+                      <p className="text-xs text-slate-500">{p.provider}</p>
+                      <p className="text-sm text-slate-700">
+                        £{Number(p.price).toFixed(2)}
+                      </p>
+                    </div>
+                  </article>
+                ))}
               </div>
             </div>
 
-            <div className="flex justify-center gap-2 mt-4">
-              {Array.from({ length: totalSlides }).map((_, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  onClick={() => goToSlide(index)}
-                  className={`h-1.5 rounded-full transition-all ${
-                    activeSlide === index
-                      ? "w-4 bg-slate-800"
-                      : "w-2 bg-slate-400"
-                  }`}
-                  aria-label={`Ir al slide ${index + 1}`}
-                />
-              ))}
+            {/* DESKTOP / TABLET: slider por páginas como ya lo tenías */}
+            <div className="hidden md:block">
+              <div className="overflow-hidden">
+                <div
+                  className="flex transition-transform duration-500"
+                  style={{ transform: `translateX(-${activeSlide * 100}%)` }}
+                >
+                  {Array.from({ length: totalSlides }).map((_, slideIndex) => {
+                    const start = slideIndex * itemsPerSlide;
+                    const end = start + itemsPerSlide;
+                    const slice = relatedProducts.slice(start, end);
+
+                    return (
+                      <div
+                        key={slideIndex}
+                        className="grid shrink-0 w-full grid-cols-2 md:grid-cols-4 gap-6"
+                      >
+                        {slice.map((p) => (
+                          <article
+                            key={p.id}
+                            role="button"
+                            onClick={() => handleRelatedClick(p.id)}
+                            className="cursor-pointer bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
+                          >
+                            <div className="aspect-[3/4] bg-slate-100">
+                              <img
+                                src={getMainImage(p)}
+                                alt={p.name}
+                                className="h-full w-full object-cover"
+                              />
+                            </div>
+                            <div className="p-3 space-y-1">
+                              <h3 className="text-sm font-medium text-slate-900 line-clamp-1">
+                                {p.name}
+                              </h3>
+                              <p className="text-xs text-slate-500">
+                                {p.provider}
+                              </p>
+                              <p className="text-sm text-slate-700">
+                                ₡{Number(p.price).toFixed(2)}
+                              </p>
+                            </div>
+                          </article>
+                        ))}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="flex justify-center gap-2 mt-4">
+                {Array.from({ length: totalSlides }).map((_, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => goToSlide(index)}
+                    className={`h-1.5 rounded-full transition-all ${
+                      activeSlide === index
+                        ? "w-4 bg-slate-800"
+                        : "w-2 bg-slate-400"
+                    }`}
+                    aria-label={`Ir al slide ${index + 1}`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>

@@ -22,17 +22,14 @@ export default function Navbar() {
         const user = JSON.parse(localStorage.getItem("currentUser") || "null");
         setCurrentUser(user);
       } catch (_) {
-        // ignorar errores de parseo
         setCurrentUser(null);
       }
     }
 
     function handleAuthChange(e) {
-      // Si el evento contiene el usuario, usarlo directamente
       if (e && e.detail && e.detail.user) {
         setCurrentUser(e.detail.user);
       } else {
-        // Si no, cargar desde localStorage
         loadUser();
       }
     }
@@ -78,22 +75,22 @@ export default function Navbar() {
   }, []);
 
   const handleLogout = () => {
-    // Limpiar usuario y carrito al cerrar sesión
+    // Limpiar usuario
     localStorage.removeItem("currentUser");
+    sessionStorage.removeItem("currentUser");
     setCurrentUser(null);
+
     try {
-      // Limpiar carrito completamente (items y userId)
       cartService.clearCart();
-    } catch (_) {
-      // ignorar
-    }
+      cartService.setUser("guest");
+    } catch (_) {}
+
     try {
       window.dispatchEvent(
         new CustomEvent("auth:changed", { detail: { user: null } })
       );
-    } catch (_) {
-      // ignorar
-    }
+    } catch (_) {}
+
     setIsMobileOpen(false);
     navigate("/");
   };
@@ -137,64 +134,52 @@ export default function Navbar() {
 
           {/* LADO DERECHO DESKTOP */}
           <div className="hidden md:flex items-center gap-6">
-            <div className="flex items-center gap-4">
-              {currentUser ? (
-                <>
-                  <button
-                    onClick={() => {
-                      if (currentUser && currentUser.rol === "Administrador") {
-                        navigate("/admin");
-                      }
-                      // si es Cliente, de momento no hace nada especial
-                    }}
-                    className="text-sm md:text-base text-brand-dark font-medium hover:opacity-90"
-                  >
-                    {currentUser.nombre}
-                  </button>
-                  <button
-                    onClick={() => {
-                      try {
-                        cartService.setUser("guest");
-                      } catch (_) {
-                        // ignorar
-                      }
-                      handleLogout();
-                    }}
-                    className="text-sm md:text-base text-brand-dark hover:text-brand transition-colors underline"
-                  >
-                    Salir
-                  </button>
-                </>
-              ) : (
-                <Link
-                  to="/login"
-                  className="text-sm md:text-base text-brand-dark hover:text-brand transition-colors"
-                >
-                  Cuenta
-                </Link>
-              )}
-            </div>
+            <div className="hidden md:flex items-center gap-6">
+              <div className="flex items-center gap-4">
+                {currentUser ? (
+                  <>
+                    <button
+                      onClick={() => {
+                        if (!currentUser) return;
 
-            {/* Search Icon */}
-            <button
-              aria-label="Buscar"
-              className="text-brand-dark hover:text-brand transition-colors"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-                />
-              </svg>
-            </button>
+                        if (
+                          currentUser.rol === "Administrador" ||
+                          currentUser.rol === "Vendedor"
+                        ) {
+                          navigate("/admin");
+                        } else {
+                          // Cliente u otro rol
+                          navigate("/cuenta");
+                        }
+                      }}
+                      className="text-sm md:text-base text-brand-dark font-medium hover:opacity-90"
+                    >
+                      {currentUser.nombre}
+                    </button>
+                    <button
+                      onClick={() => {
+                        try {
+                          cartService.setUser("guest");
+                        } catch (_) {
+                          // ignorar
+                        }
+                        handleLogout();
+                      }}
+                      className="text-sm md:text-base text-brand-dark hover:text-brand transition-colors underline"
+                    >
+                      Salir
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="text-sm md:text-base text-brand-dark hover:text-brand transition-colors"
+                  >
+                    Cuenta
+                  </Link>
+                )}
+              </div>
+            </div>
 
             {/* Cart Icon with Badge */}
             <Link
@@ -224,27 +209,6 @@ export default function Navbar() {
 
           {/* LADO DERECHO MOBILE */}
           <div className="flex items-center gap-4 md:hidden">
-            {/* Search small */}
-            <button
-              aria-label="Buscar"
-              className="text-brand-dark hover:text-brand transition-colors"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-                />
-              </svg>
-            </button>
-
             {/* Cart small */}
             <Link
               to="/cart"
@@ -379,6 +343,19 @@ export default function Navbar() {
                   className="py-1 text-left text-brand-dark hover:text-brand transition-colors font-medium"
                 >
                   Panel administrativo
+                </button>
+              )}
+
+              {currentUser && currentUser.rol === "Cliente" && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigate("/cuenta");
+                    setIsMobileOpen(false);
+                  }}
+                  className="py-1 text-left text-brand-dark hover:text-brand transition-colors font-medium"
+                >
+                  Mi cuenta
                 </button>
               )}
             </nav>

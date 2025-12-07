@@ -4,24 +4,28 @@ import productService from "@/modules/store/services/productService";
 import { Link } from "react-router-dom";
 import cartService from "@/modules/store/services/cartService";
 import CartAddedDialog from "@/components/CartAddedDialog";
+import { useNavigate } from "react-router-dom";
 
 export default function Home() {
+  const navigate = useNavigate();
+
   const collections = [
-    { name: "Viernes Negro", image: "/images/placeholder.png" },
+    { name: "Viernes Negro", image: "/images/bellas-boutique-1.webp" },
     {
       name: "Una nueva perspectiva",
-      image: "/images/placeholder.png",
+      image: "/images/bellas-boutique-3.webp",
     },
-    { name: "Mujeres", image: "/images/placeholder.png" },
+    { name: "Mujeres", image: "/images/bellas-boutique-2.webp" },
   ];
 
-  // 🔽 antes era una constante, ahora viene del servicio
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [heroVisible, setHeroVisible] = useState(false);
-  const [activeCollection, setActiveCollection] = useState(0);
   const [addedToBag] = useState(false);
 
   const featuredSectionRef = useRef(null);
+
+  const getMainImage = (p) =>
+    p?.images?.[0] || p?.imagen || p?.image || "/images/placeholder.png";
 
   // cargar productos destacados
   useEffect(() => {
@@ -29,7 +33,7 @@ export default function Home() {
 
     const loadFeatured = async () => {
       try {
-        const data = await productService.listFeatured(8);
+        const data = await productService.listFeatured(4);
         if (!cancelled) {
           setFeaturedProducts(data);
         }
@@ -62,7 +66,7 @@ export default function Home() {
       id: p.id,
       name: p.name,
       price: p.price,
-      image: p.image,
+      image: getMainImage(p),
       quantity: 1,
       color: null,
       size: null,
@@ -78,7 +82,7 @@ export default function Home() {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: "url('/images/placeholder.png')",
+            backgroundImage: "url('/images/bellas-boutique-4.webp')",
           }}
         />
         <div className="absolute inset-0 bg-black/40" />
@@ -119,22 +123,25 @@ export default function Home() {
           <h2 className="text-xl font-semibold tracking-tight">
             Nuestras Colecciones
           </h2>
-          <button className="text-sm text-slate-500 hover:text-slate-800 transition">
-            Ver todas
-          </button>
         </div>
 
-        {/* En mobile: carrusel (1 card); en md+: las 3 */}
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
-          {collections.map((c, index) => (
+        {/* Mobile: slider horizontal; sm+: grid de 3 */}
+        <div
+          className="
+            flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory
+            sm:grid sm:grid-cols-3 sm:gap-4 sm:overflow-visible sm:snap-none
+          "
+        >
+          {collections.map((c) => (
             <article
               key={c.name}
-              className={`
+              className="
                 relative h-72 overflow-hidden rounded-lg group shadow-sm
                 transition-transform duration-500 ease-out
                 hover:-translate-y-1 hover:shadow-lg
-                ${index === activeCollection ? "block" : "hidden sm:block"}
-              `}
+                min-w-[80%] snap-center
+                sm:min-w-0
+              "
             >
               <div
                 className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
@@ -148,25 +155,6 @@ export default function Home() {
                 </p>
               </div>
             </article>
-          ))}
-        </div>
-
-        {/* puntitos tipo slider (solo mobile) */}
-        <div className="mt-4 flex justify-center gap-2 sm:hidden">
-          {collections.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setActiveCollection(index)}
-              className={`
-                h-1.5 rounded-full transition-all
-                ${
-                  index === activeCollection
-                    ? "w-4 bg-brand-dark"
-                    : "w-1.5 bg-brand-light"
-                }
-              `}
-              aria-label={`Ir a colección ${index + 1}`}
-            />
           ))}
         </div>
       </section>
@@ -185,21 +173,35 @@ export default function Home() {
               Piezas cuidadosamente seleccionadas para esta temporada.
             </p>
           </div>
-          <button className="text-sm text-brand-dark underline underline-offset-4 hover:text-brand transition">
+          <button
+            onClick={() => navigate("/products")}
+            className="text-sm text-brand-dark underline underline-offset-4 hover:text-brand transition"
+          >
             Ir a la tienda completa
           </button>
         </div>
 
-        <div className="grid gap-6 grid-cols-2 md:grid-cols-4">
+        {/* Mobile: slider horizontal; md+: grid de 4 */}
+        <div
+          className="
+            flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory
+            md:grid md:grid-cols-4 md:gap-6 md:overflow-visible md:snap-none
+          "
+        >
           {featuredProducts.map((p) => (
             <article
               key={p.id}
-              className="rounded-lg border bg-white overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300"
+              className="
+                min-w-[70%] max-w-[80%] snap-start
+                rounded-lg border bg-white overflow-hidden shadow-sm
+                hover:shadow-md hover:-translate-y-1 transition-all duration-300
+                md:min-w-0 md:max-w-none
+              "
             >
               <Link to={`/products/${p.id}`}>
                 <div
                   className="h-40 md:h-48 bg-cover bg-center"
-                  style={{ backgroundImage: `url('${p.image}')` }}
+                  style={{ backgroundImage: `url('${getMainImage(p)}')` }}
                 />
               </Link>
               <div className="p-4 space-y-2">
@@ -248,9 +250,6 @@ export default function Home() {
             puedas combinar, crear outfits y sentirte segura al comprar desde
             cualquier lugar.
           </p>
-          <button className="text-sm underline underline-offset-4 text-brand-dark hover:text-brand transition">
-            Más información sobre Bellas Boutique
-          </button>
         </div>
 
         {/* Our mission */}
@@ -278,7 +277,7 @@ export default function Home() {
         <div
           className="absolute inset-0 bg-cover bg-center scale-105"
           style={{
-            backgroundImage: "url('/images/placeholder.png')",
+            backgroundImage: "url('/images/bellas-boutique-5.webp')",
           }}
         />
         <div className="absolute inset-0 bg-black/40" />
@@ -294,7 +293,10 @@ export default function Home() {
               Descubre las piezas diseñadas juntas para los días que se
               convierten en noches.
             </p>
-            <Button className="inline-flex rounded-full px-6 py-2 text-sm font-medium">
+            <Button
+              onClick={() => navigate("/products")}
+              className="inline-flex rounded-full px-6 py-2 text-sm font-medium"
+            >
               Ver la colección
             </Button>
           </div>

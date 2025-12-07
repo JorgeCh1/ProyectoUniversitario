@@ -19,6 +19,13 @@ export default function ProductList() {
     return () => clearTimeout(timer);
   }, []);
 
+  const getMainImage = (p) =>
+  p?.images?.[0] ||
+  p?.imagen ||
+  p?.image ||
+  "/images/placeholder.png";
+
+
   // cargar catálogo
   useEffect(() => {
     let cancelled = false;
@@ -65,7 +72,7 @@ export default function ProductList() {
       id: product.id,
       name: product.name,
       price,
-      image: product.image,
+      image: getMainImage(product),
       quantity: 1,
       color: null,
       size: null,
@@ -77,22 +84,12 @@ export default function ProductList() {
   const formatPrice = (price) => `₡${Number(price).toLocaleString("es-CR")}`;
 
   const collections = [
+    { name: "Viernes Negro", image: "/images/bellas-boutique-1.webp" },
     {
-      name: "Elite",
-      image: "/images/collections/elite.png",
+      name: "Una nueva perspectiva",
+      image: "/images/bellas-boutique-3.webp",
     },
-    {
-      name: "Chamarel",
-      image: "/images/collections/chamarel.png",
-    },
-    {
-      name: "Wildside",
-      image: "/images/collections/wildside.png",
-    },
-    {
-      name: "Messina",
-      image: "/images/collections/messina.png",
-    },
+    { name: "Mujeres", image: "/images/bellas-boutique-2.webp" },
   ];
 
   return (
@@ -102,7 +99,7 @@ export default function ProductList() {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: "url('/images/placeholder.png')",
+            backgroundImage: "url('/images/bellas-boutique-4.webp')",
           }}
         />
         <div className="absolute inset-0 bg-black/40" />
@@ -131,25 +128,42 @@ export default function ProductList() {
         </div>
       </section>
 
-      {/* FEATURED COLLECTIONS */}
-      <section className="max-w-7xl mx-auto px-4 py-10 space-y-6">
-        <h2 className="text-lg md:text-xl font-semibold tracking-tight">
-          Colecciones destacadas
-        </h2>
+      {/* OUR COLLECTIONS */}
+      <section className="max-w-7xl mx-auto px-4 py-12">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold tracking-tight">
+            Nuestras Colecciones
+          </h2>
+        </div>
 
-        <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+        {/* Mobile: slider horizontal; sm+: grid de 3 */}
+        <div
+          className="
+            flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory
+            sm:grid sm:grid-cols-3 sm:gap-4 sm:overflow-visible sm:snap-none
+          "
+        >
           {collections.map((c) => (
             <article
               key={c.name}
-              className="group relative overflow-hidden rounded-lg h-52 md:h-64 cursor-pointer"
+              className="
+                relative h-72 overflow-hidden rounded-lg group shadow-sm
+                transition-transform duration-500 ease-out
+                hover:-translate-y-1 hover:shadow-lg
+                min-w-[80%] snap-center
+                sm:min-w-0
+              "
             >
               <div
                 className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
                 style={{ backgroundImage: `url('${c.image}')` }}
               />
               <div className="absolute inset-0 bg-black/30" />
-              <div className="relative h-full flex items-end p-4">
-                <h3 className="text-white text-lg font-medium">{c.name}</h3>
+              <div className="relative h-full flex flex-col justify-end p-5 text-white">
+                <h3 className="text-lg font-medium">{c.name}</h3>
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-100/80">
+                  Compra ahora
+                </p>
               </div>
             </article>
           ))}
@@ -232,7 +246,7 @@ export default function ProductList() {
                   <Link to={`/products/${p.id}`}>
                     <div className="aspect-[3/4] bg-slate-100">
                       <img
-                        src={p.image || "/images/placeholder.png"}
+                        src={getMainImage(p)}
                         alt={p.name}
                         className="h-full w-full object-cover"
                       />

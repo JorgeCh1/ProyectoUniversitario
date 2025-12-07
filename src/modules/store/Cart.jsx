@@ -21,6 +21,7 @@ export default function Cart() {
       // ignorar errores de parseo
       setCurrentUser(null);
     }
+
     // Escuchar cambios de autenticación para actualizar usuario
     function onAuthChanged(e) {
       try {
@@ -77,6 +78,19 @@ export default function Cart() {
     setItems(updated);
   };
 
+  // NUEVO: Actualizar carrito desde storage
+  const handleRefreshCart = () => {
+    const refreshedItems = cartService.getCart();
+    const refreshedMeta = cartService.getCartMeta();
+    setItems(refreshedItems);
+    setMeta(refreshedMeta);
+  };
+
+  // NUEVO: Seguir comprando (ir a la tienda o al home)
+  const handleContinueShopping = () => {
+    navigate("/products"); // o "/" si preferís el home
+  };
+
   return (
     <section className="max-w-4xl mx-auto px-4 py-10">
       <h1 className="text-center text-2xl md:text-3xl font-semibold tracking-tight mb-8">
@@ -129,7 +143,7 @@ export default function Cart() {
                     <p className="text-xs text-slate-500">
                       {item.color && <span>{item.color}</span>}
                       {item.color && item.size && <span> · </span>}
-                      {item.size && <span>Size {item.size}</span>}
+                      {item.size && <span>Talla {item.size}</span>}
                     </p>
                     <button
                       type="button"
@@ -189,11 +203,21 @@ export default function Cart() {
               Limpiar carrito
             </button>
             <p>
-              <span className="underline cursor-pointer">
+              <button
+                type="button"
+                onClick={handleRefreshCart}
+                className="underline cursor-pointer hover:text-slate-800"
+              >
                 Actualizar carrito
-              </span>{" "}
+              </button>{" "}
               |{" "}
-              <span className="underline cursor-pointer">Seguir comprando</span>
+              <button
+                type="button"
+                onClick={handleContinueShopping}
+                className="underline cursor-pointer hover:text-slate-800"
+              >
+                Seguir comprando
+              </button>
             </p>
           </div>
 

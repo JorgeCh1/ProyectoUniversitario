@@ -156,6 +156,14 @@ const cartService = {
   clearCart() {
     const fresh = getInitialCart();
     saveCartRaw(fresh);
+
+    try {
+      // avisar a toda la app que el carrito quedó en 0
+      window.dispatchEvent(
+        new CustomEvent("cart:changed", { detail: { total: 0 } })
+      );
+    } catch (_) {}
+
     return fresh.items;
   },
 };

@@ -47,7 +47,8 @@ import ProductsManagementView from "./components/ProductsManagement.jsx";
 import SalesManagementView from "./components/SalesManagement.jsx";
 import PaymentsMonitoringView from "./components/PaymentsMonitoring.jsx";
 
-// CLIENTE ➜ ADMIN (inglés ➜ español)
+
+// CLIENTE ➜ ADMIN (formato normalizado ➜ admin en español)
 function mapClientToAdminProducts(clientProducts) {
   return clientProducts.map((p) => ({
     id: p.id,
@@ -57,33 +58,167 @@ function mapClientToAdminProducts(clientProducts) {
     stock: p.stock,
     categoria: p.category,
     proveedor: p.provider,
-    imagen: p.image,
-    estado: "Activo",
+    // tomo la principal y también guardo arreglo
+    imagen: p.image ?? p.images?.[0] ?? "",
+    imagenes: p.images ?? (p.image ? [p.image] : []),
+    estado: p.status ?? "Activo",
   }));
 }
 
+// ADMIN ➜ CLIENTE (lo que se guarda en localStorage)
+function mapAdminToClientProducts(adminProducts) {
+  return adminProducts.map((p) => ({
+    id: p.id,
+    nombre: p.nombre,
+    descripcion: p.descripcion,
+    precio: p.precio,
+    stock: p.stock,
+    categoria: p.categoria,
+    proveedor: p.proveedor,
+    imagenes: p.imagenes && p.imagenes.length
+      ? p.imagenes
+      : p.imagen
+        ? [p.imagen]
+        : [],
+    estado: p.estado ?? "Activo",
+  }));
+}
+
+
 // Por si no hay nada en storage todavía
 const initialAdminProducts = [
+    // ZAPATOS
   {
     id: "P001",
-    nombre: "Producto A",
-    descripcion: "Descripción del producto A",
-    precio: 25000,
-    stock: 50,
-    categoria: "Electrónica",
-    proveedor: "Proveedor 1",
-    imagen: "",
+    nombre: "Sandalias de Tacón Minimalistas Nude",
+    descripcion: "Sandalias elegantes de tacón bajo estilo minimalista.",
+    precio: 35000,
+    stock: 20,
+    categoria: "Zapato",
+    proveedor: "Proveedor Zapatos",
+    imagenes: [
+      "/images/products/bellas-boutique-products-020.webp",
+      "/images/products/bellas-boutique-products-021.webp",
+      "/images/products/bellas-boutique-products-022.webp",
+      "/images/products/bellas-boutique-products-021.webp",
+    ],
     estado: "Activo",
   },
   {
     id: "P002",
-    nombre: "Producto B",
-    descripcion: "Descripción del producto B",
-    precio: 15000,
-    stock: 5,
+    nombre: "Tenis Urbanos Blancos Plataforma",
+    descripcion: "Tenis urbanos con plataforma y acabado blanco.",
+    precio: 42000,
+    stock: 30,
+    categoria: "Zapato",
+    proveedor: "Proveedor Zapatos",
+    // si quieres, luego le pones sus 4 imágenes
+    imagenes: [
+      "/images/products/bellas-boutique-products-026.webp",
+      "/images/products/bellas-boutique-products-018.webp",
+      "/images/products/bellas-boutique-products-019.webp",
+      "/images/products/bellas-boutique-products-026.webp",
+    ],
+    estado: "Activo",
+  },
+  {
+    id: "P003",
+    nombre: "Botines Negros de Cuero Premium",
+    descripcion: "Botines de cuero genuino estilo premium.",
+    precio: 80000,
+    stock: 15,
+    categoria: "Zapato",
+    proveedor: "Proveedor Zapatos",
+    imagenes: [
+      "/images/products/bellas-boutique-products-017.webp",
+      "/images/products/bellas-boutique-products-024.webp",
+      "/images/products/bellas-boutique-products-023.webp",
+      "/images/products/bellas-boutique-products-025.webp",
+    ],
+    estado: "Activo",
+  },
+
+  // ROPA
+  {
+    id: "P004",
+    nombre: "Vestido Midi Floral Primavera",
+    descripcion: "Vestido de corte midi con estampado floral.",
+    precio: 55000,
+    stock: 25,
     categoria: "Ropa",
-    proveedor: "Proveedor 2",
-    imagen: "",
+    proveedor: "Proveedor Ropa",
+    imagenes: [
+      "/images/products/bellas-boutique-products-014.webp",
+      "/images/products/bellas-boutique-products-016.webp",
+      "/images/products/bellas-boutique-products-027.webp",
+      "/images/products/bellas-boutique-products-015.webp",
+    ],
+    estado: "Activo",
+  },
+  {
+    id: "P005",
+    nombre: "Blusa Satinada Manga Globo",
+    descripcion: "Blusa satinada elegante con mangas tipo globo.",
+    precio: 30000,
+    stock: 40,
+    categoria: "Ropa",
+    proveedor: "Proveedor Ropa",
+    imagenes: [
+      "/images/products/bellas-boutique-products-006.webp",
+      "/images/products/bellas-boutique-products-002.webp",
+      "/images/products/bellas-boutique-products-012.webp",
+      "/images/products/bellas-boutique-products-002.webp",
+    ],
+    estado: "Activo",
+  },
+  {
+    id: "P006",
+    nombre: "Pantalón Palazzo Beige Elegante",
+    descripcion: "Pantalón palazzo beige de tela suave y elegante.",
+    precio: 32000,
+    stock: 35,
+    categoria: "Ropa",
+    proveedor: "Proveedor Ropa",
+    imagenes: [
+      "/images/products/bellas-boutique-products-029.webp",
+      "/images/products/bellas-boutique-products-013.webp",
+      "/images/products/bellas-boutique-products-007.webp",
+      "/images/products/bellas-boutique-products-001.webp",
+    ],
+    estado: "Activo",
+  },
+
+  // JOYERÍA
+  {
+    id: "P007",
+    nombre: "Collar Dorado Minimalista con Dije",
+    descripcion: "Collar delgado dorado con dije minimalista.",
+    precio: 18000,
+    stock: 50,
+    categoria: "Joyería",
+    proveedor: "Proveedor Joyería",
+    imagenes: [
+      "/images/products/bellas-boutique-products-008.webp",
+      "/images/products/bellas-boutique-products-011.webp",
+      "/images/products/bellas-boutique-products-005.webp",
+      "/images/products/bellas-boutique-products-009.webp",
+    ],
+    estado: "Activo",
+  },
+  {
+    id: "P008",
+    nombre: "Aretes Aro Plata 925 Premium",
+    descripcion: "Aretes tipo aro fabricados en plata 925.",
+    precio: 25000,
+    stock: 45,
+    categoria: "Joyería",
+    proveedor: "Proveedor Joyería",
+    imagenes: [
+      "/images/products/bellas-boutique-products-010.webp",
+      "/images/products/bellas-boutique-products-028.webp",
+      "/images/products/bellas-boutique-products-004.webp",
+      "/images/products/bellas-boutique-products-003.webp",
+    ],
     estado: "Activo",
   },
 ];
@@ -119,33 +254,51 @@ export default function AdminDashboard() {
   }, []);
 
   useEffect(() => {
-    let cancelled = false;
+  let cancelled = false;
 
-    const loadProductsForAdmin = async () => {
-      try {
-        // lee el catálogo que ve el cliente (localStorage o base)
-        const clientProducts = await productService.list();
+  const loadProductsForAdmin = async () => {
+    try {
+      const clientProducts = await productService.list();
 
-        if (cancelled) return;
+      if (cancelled) return;
 
-        if (clientProducts && clientProducts.length > 0) {
-          setProducts(mapClientToAdminProducts(clientProducts));
-        } else {
-          setProducts(initialAdminProducts);
+      if (clientProducts && clientProducts.length > 0) {
+        // ya hay catálogo del lado cliente
+        setProducts(mapClientToAdminProducts(clientProducts));
+      } else {
+        // no hay nada en localStorage → usamos los iniciales
+        setProducts(initialAdminProducts);
+
+        const clientMapped = mapAdminToClientProducts(initialAdminProducts);
+        try {
+          productService.saveAll(clientMapped);
+        } catch (err) {
+          console.error("Error guardando productos iniciales:", err);
         }
-      } catch (e) {
-        console.error("Error cargando productos para admin:", e);
-        if (!cancelled) setProducts(initialAdminProducts);
-      } finally {
-        if (!cancelled) setLoadingProducts(false);
       }
-    };
+    } catch (e) {
+      console.error("Error cargando productos para admin:", e);
 
-    loadProductsForAdmin();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+      if (!cancelled) {
+        setProducts(initialAdminProducts);
+        const clientMapped = mapAdminToClientProducts(initialAdminProducts);
+        try {
+          productService.saveAll(clientMapped);
+        } catch (err) {
+          console.error("Error guardando productos iniciales (fallback):", err);
+        }
+      }
+    } finally {
+      if (!cancelled) setLoadingProducts(false);
+    }
+  };
+
+  loadProductsForAdmin();
+  return () => {
+    cancelled = true;
+  };
+}, []);
+
 
   const [sales, setSales] = useState([]);
 
@@ -476,26 +629,42 @@ function UserEditForm({ user, onSave, onCancel }) {
   )
 }
 
-function ProductsManagement({
-  products,
-  setProducts,
-}) {
-  const [editingProduct, setEditingProduct] = useState(null)
-  const [isAddingNew, setIsAddingNew] = useState(false)
+function ProductsManagement({ products, setProducts }) {
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [isAddingNew, setIsAddingNew] = useState(false);
+
+  // NUEVO: sincroniza admin ➜ cliente
+  const syncWithStore = (updatedAdminProducts) => {
+    setProducts(updatedAdminProducts);
+    const clientProducts = mapAdminToClientProducts(updatedAdminProducts);
+    try {
+      productService.saveAll(clientProducts);
+    } catch (err) {
+      console.error("Error sincronizando catálogo de cliente:", err);
+    }
+  };
 
   const handleSaveProduct = (product) => {
+    let updated;
+
     if (isAddingNew) {
-      setProducts([...products, { ...product, id: `P${String(products.length + 1).padStart(3, "0")}` }])
-      setIsAddingNew(false)
+      const newId = `P${String(products.length + 1).padStart(3, "0")}`;
+      updated = [...products, { ...product, id: newId }];
+      setIsAddingNew(false);
     } else {
-      setProducts(products.map((p) => (p.id === product.id ? product : p)))
+      updated = products.map((p) => (p.id === product.id ? product : p));
     }
-    setEditingProduct(null)
-  }
+
+    setEditingProduct(null);
+    syncWithStore(updated);
+  };
 
   const handleDeleteProduct = (productId) => {
-    setProducts(products.map((p) => (p.id === productId ? { ...p, estado: "Inactivo" } : p)))
-  }
+    const updated = products.map((p) =>
+      p.id === productId ? { ...p, estado: "Inactivo" } : p
+    );
+    syncWithStore(updated);
+  };
 
   return (
     <div className="space-y-6">

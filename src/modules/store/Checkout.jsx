@@ -26,6 +26,15 @@ export default function Checkout() {
 
   const [submitted, setSubmitted] = useState(false);
 
+  // CAMPOS DE TARJETA (SIMULADO)
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardName, setCardName] = useState("");
+  const [cardExpiry, setCardExpiry] = useState("");
+  const [cardCvc, setCardCvc] = useState("");
+
+  // FACTURA GENERADA (para mostrar resumen al usuario)
+  const [lastInvoice, setLastInvoice] = useState(null);
+
   useEffect(() => {
     // Cargar carrito y pre-llenar con datos del usuario
     setItems(cartService.getCart());
@@ -82,12 +91,27 @@ export default function Checkout() {
 
   const formatPrice = (price) => `₡${Number(price).toLocaleString("es-CR")}`;
 
+  const cardHasErrors =
+    paymentMethod === "card" &&
+    (!cardNumber.trim() ||
+      !cardName.trim() ||
+      !cardExpiry.trim() ||
+      !cardCvc.trim());
+
   const hasErrors =
     !name.trim() ||
     !email.trim() ||
     !phone.trim() ||
     !country ||
-    !address.trim();
+    !address.trim() ||
+    cardHasErrors;
+
+  const getPaymentMethodLabel = (method) => {
+    if (method === "card") return "Tarjeta de crédito / débito";
+    if (method === "sinpe") return "SINPE Móvil";
+    if (method === "transfer") return "Transferencia bancaria";
+    return method;
+  };
 
   const handleConfirmPayment = async () => {
     setSubmitted(true);
@@ -100,6 +124,16 @@ export default function Checkout() {
       status: "SUCCESS", // en backend se validaría de verdad
       paidAt: now.toISOString(),
       amount: total,
+      // Solo para demo, guardamos los campos de tarjeta (en real NO se guardarían así)
+      cardInfo:
+        paymentMethod === "card"
+          ? {
+              cardNumber,
+              cardName,
+              cardExpiry,
+              cardCvc,
+            }
+          : null,
     };
 
     // Factura digital generada en el cliente (luego se enviaría al backend)
@@ -131,6 +165,8 @@ export default function Checkout() {
 
     console.log("Invoice generated (client-side):", invoice);
 
+    // Guardamos la factura en estado para mostrar el resumen
+    setLastInvoice(invoice);
     setPaymentStatus("SUCCESS");
 
     // 1) Guardar venta para el panel admin
@@ -164,11 +200,12 @@ export default function Checkout() {
         console.error("Error actualizando stock:", e);
       }
     })();
+
     // Simulación: después de 1.5s redirige a home
     setTimeout(() => {
       cartService.clearCart();
       navigate("/");
-    }, 1500);
+    }, 10000);
   };
 
   const createdAtLabel = meta.createdAt
@@ -178,21 +215,144 @@ export default function Checkout() {
   return (
     <section className="max-w-5xl mx-auto px-4 py-10">
       {paymentStatus === "SUCCESS" ? (
-        <div className="text-center space-y-4">
-          <h1 className="text-3xl font-semibold text-brand-dark">
-            ¡Gracias por tu compra!
-          </h1>
-          <p className="text-slate-600">
-            Tu pedido ha sido confirmado exitosamente.
-          </p>
-          {currentUser && (
-            <p className="text-sm text-slate-500">
-              Confirmación enviada a: <strong>{email}</strong>
+        <div className="space-y-5 max-w-3xl mx-auto">
+          <div className="text-center space-y-2">
+            <h1 className="text-3xl font-semibold text-brand-dark">
+              ¡Gracias por tu compra!
+            </h1>
+            <p className="text-slate-600">
+              Tu pedido ha sido confirmado exitosamente.
             </p>
+            {lastInvoice?.shippingInfo?.email && (
+              <p className="text-sm text-slate-500">
+                Hemos enviado el resumen de tu compra al correo{" "}
+                <strong>{lastInvoice.shippingInfo.email}</strong> (simulado).
+              </p>
+            )}
+            <p className="text-xs text-slate-400 mt-2">
+              Serás redirigido a la página principal en breve...
+            </p>
+          </div>
+
+          {/* RESUMEN DE LA COMPRA */}
+          {lastInvoice && (
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.18em] text-slate-500">
+                    Resumen de la compra
+                  </p>
+                  <p className="text-sm text-slate-700">
+                    Factura:{" "}
+                    <span className="font-semibold">
+                      {lastInvoice.invoiceNumber}
+                    </span>
+                  </p>
+                </div>
+                <div className="text-sm text-slate-600 md:text-right">
+                  <p>
+                    Monto total:{" "}
+                    <span className="font-semibold">
+                      {formatPrice(lastInvoice.total)}
+                    </span>
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    Método de pago:{" "}
+                    {getPaymentMethodLabel(lastInvoice.payment.method)}
+                  </p>
+                </div>
+              </div>
+
+              {/* Productos */}
+              <div>
+                <p className="text-xs font-semibold text-slate-700 mb-2">
+                  Productos incluidos
+                </p>
+                <div className="border border-slate-200 rounded-lg overflow-hidden">
+                  <table className="w-full text-xs md:text-sm">
+                    <thead className="bg-slate-50">
+                      <tr className="text-left text-slate-500">
+                        <th className="px-3 py-2 font-medium">Producto</th>
+                        <th className="px-3 py-2 font-medium text-right">
+                          Cantidad
+                        </th>
+                        <th className="px-3 py-2 font-medium text-right">
+                          Precio unitario
+                        </th>
+                        <th className="px-3 py-2 font-medium text-right">
+                          Total
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {lastInvoice.products.map((prod, idx) => (
+                        <tr
+                          key={`${prod.productId}-${idx}`}
+                          className="border-t border-slate-100"
+                        >
+                          <td className="px-3 py-2 text-slate-700">
+                            {prod.name}
+                          </td>
+                          <td className="px-3 py-2 text-right">
+                            {prod.quantity}
+                          </td>
+                          <td className="px-3 py-2 text-right">
+                            {formatPrice(prod.unitPrice)}
+                          </td>
+                          <td className="px-3 py-2 text-right">
+                            {formatPrice(prod.unitPrice * prod.quantity)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Totales */}
+              <div className="space-y-1 text-sm text-slate-700 max-w-xs ml-auto">
+                <div className="flex justify-between">
+                  <span>Subtotal</span>
+                  <span>{formatPrice(lastInvoice.subtotal)}</span>
+                </div>
+                <div className="flex justify-between text-slate-600 text-xs">
+                  <span>Impuesto ({lastInvoice.taxRate * 100}%)</span>
+                  <span>{formatPrice(lastInvoice.tax)}</span>
+                </div>
+                <div className="border-t border-slate-200 my-1" />
+                <div className="flex justify-between font-semibold">
+                  <span>Total</span>
+                  <span>{formatPrice(lastInvoice.total)}</span>
+                </div>
+              </div>
+
+              {/* Datos de envío */}
+              <div className="pt-3 border-t border-slate-200">
+                <p className="text-xs font-semibold text-slate-700 mb-1">
+                  Datos de envío
+                </p>
+                <p className="text-xs text-slate-600">
+                  <strong>Nombre:</strong> {lastInvoice.shippingInfo.name}
+                </p>
+                <p className="text-xs text-slate-600">
+                  <strong>Teléfono:</strong> {lastInvoice.shippingInfo.phone}
+                </p>
+                <p className="text-xs text-slate-600">
+                  <strong>País:</strong>{" "}
+                  {lastInvoice.shippingInfo.country.toUpperCase()}
+                </p>
+                <p className="text-xs text-slate-600">
+                  <strong>Dirección:</strong> {lastInvoice.shippingInfo.address}
+                </p>
+                {lastInvoice.shippingInfo.note && (
+                  <p className="text-xs text-slate-500 mt-1">
+                    <strong>Nota del pedido:</strong>{" "}
+                    {lastInvoice.shippingInfo.note}
+                  </p>
+                )}
+              </div>
+            </div>
           )}
-          <p className="text-xs text-slate-400 mt-4">
-            Serás redirigido a la página principal en breve...
-          </p>
         </div>
       ) : (
         <>
@@ -376,6 +536,101 @@ export default function Checkout() {
                   </label>
                 </div>
 
+                {/* CAMPOS DE TARJETA (SOLO SI TARJETA) */}
+                {paymentMethod === "card" && (
+                  <div className="mt-4 border border-slate-200 rounded-lg p-4 bg-slate-50 space-y-3">
+                    <p className="text-xs font-semibold text-slate-700 uppercase tracking-[0.16em]">
+                      Detalles de la tarjeta (simulado)
+                    </p>
+
+                    {/* Número de tarjeta */}
+                    <div className="space-y-1">
+                      <label className="text-xs font-medium text-slate-700">
+                        Número de tarjeta *
+                      </label>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={19}
+                        className="w-full border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-300"
+                        placeholder="4242 4242 4242 4242"
+                        value={cardNumber}
+                        onChange={(e) => setCardNumber(e.target.value)}
+                      />
+                      {submitted && !cardNumber.trim() && (
+                        <p className="text-[11px] text-red-500">
+                          El número de tarjeta es requerido.
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Nombre en la tarjeta */}
+                    <div className="space-y-1">
+                      <label className="text-xs font-medium text-slate-700">
+                        Nombre en la tarjeta *
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-300"
+                        placeholder="Bellas Boutique Test"
+                        value={cardName}
+                        onChange={(e) => setCardName(e.target.value)}
+                      />
+                      {submitted && !cardName.trim() && (
+                        <p className="text-[11px] text-red-500">
+                          El nombre en la tarjeta es requerido.
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Fecha de vencimiento + CVC */}
+                    <div className="grid gap-3 md:grid-cols-2">
+                      <div className="space-y-1">
+                        <label className="text-xs font-medium text-slate-700">
+                          Fecha de vencimiento (MM/AA) *
+                        </label>
+                        <input
+                          type="text"
+                          className="w-full border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-300"
+                          placeholder="12/28"
+                          value={cardExpiry}
+                          onChange={(e) => setCardExpiry(e.target.value)}
+                        />
+                        {submitted && !cardExpiry.trim() && (
+                          <p className="text-[11px] text-red-500">
+                            La fecha de vencimiento es requerida.
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-xs font-medium text-slate-700">
+                          CVC *
+                        </label>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={4}
+                          className="w-full border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-300"
+                          placeholder="123"
+                          value={cardCvc}
+                          onChange={(e) => setCardCvc(e.target.value)}
+                        />
+                        {submitted && !cardCvc.trim() && (
+                          <p className="text-[11px] text-red-500">
+                            El CVC es requerido.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <p className="text-[11px] text-slate-500 mt-1">
+                      Este formulario es solo de demostración. No se realiza
+                      ningún cobro real.
+                    </p>
+                  </div>
+                )}
+
                 {submitted && items.length === 0 && (
                   <p className="mt-2 text-[11px] text-red-500">
                     Tu carrito está vacío.
@@ -432,7 +687,7 @@ export default function Checkout() {
                     <p className="font-semibold text-slate-900 mb-1">
                       Tarjeta de crédito / débito (Demo)
                     </p>
-                    <p>Utiliza la siguiente información de demostración:</p>
+                    <p>Ejemplo de datos de prueba:</p>
                     <ul className="mt-2 text-xs space-y-1">
                       <li>
                         • Número de tarjeta:{" "}
@@ -457,7 +712,7 @@ export default function Checkout() {
                       SINPE Móvil
                     </p>
                     <p>Envía el pago al siguiente número:</p>
-                    <ul className="mt-2 text-xs space-y-1">
+                    <ul la className="mt-2 text-xs space-y-1">
                       <li>
                         • Número: <strong>+506 8888-1234</strong>
                       </li>

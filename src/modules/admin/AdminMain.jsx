@@ -671,17 +671,27 @@ function ProductsManagement({ products, setProducts }) {
       <div className="bg-white rounded-lg border border-slate-200">
         <div className="px-4 md:px-6 py-4 border-b border-slate-200 flex items-center justify-between flex-col md:flex-row gap-4 md:gap-0">
           <div>
-            <h2 className="text-lg font-semibold text-brand-dark">Gestión de Productos</h2>
-            <p className="text-sm text-slate-500 mt-1">Administra el catálogo de productos de tu tienda</p>
+            <h2 className="text-lg font-semibold text-brand-dark">
+              Gestión de Productos
+            </h2>
+            <p className="text-sm text-slate-500 mt-1">
+              Administra el catálogo de productos de tu tienda
+            </p>
           </div>
           <Dialog open={isAddingNew} onOpenChange={setIsAddingNew}>
             <DialogTrigger asChild>
-              <Button className="bg-brand-dark hover:bg-brand">Registrar Nuevo Producto</Button>
+              <Button className="bg-brand-dark hover:bg-brand">
+                Registrar Nuevo Producto
+              </Button>
             </DialogTrigger>
             <DialogContent className="max-w-[95vw] sm:max-w-xl md:max-w-2xl md:p-8">
               <DialogHeader>
-                <DialogTitle className="text-3xl md:text-4xl font-semibold text-slate-900">Registrar Nuevo Producto</DialogTitle>
-                <DialogDescription className="text-sm md:text-base text-slate-600">Completa la información del nuevo producto para el catálogo</DialogDescription>
+                <DialogTitle className="text-3xl md:text-4xl font-semibold text-slate-900">
+                  Registrar Nuevo Producto
+                </DialogTitle>
+                <DialogDescription className="text-sm md:text-base text-slate-600">
+                  Completa la información del nuevo producto para el catálogo
+                </DialogDescription>
               </DialogHeader>
               <ProductForm
                 product={{
@@ -693,6 +703,7 @@ function ProductsManagement({ products, setProducts }) {
                   categoria: "",
                   proveedor: "",
                   imagen: "",
+                  imagenes: [],
                   estado: "Activo",
                 }}
                 onSave={handleSaveProduct}
@@ -725,13 +736,21 @@ function ProductsManagement({ products, setProducts }) {
                   <TableCell>{product.categoria}</TableCell>
                   <TableCell>₡{product.precio.toLocaleString()}</TableCell>
                   <TableCell>
-                    <span className={product.stock < 10 ? "text-red-600 font-medium" : ""}>{product.stock}</span>
+                    <span
+                      className={
+                        product.stock < 10 ? "text-red-600 font-medium" : ""
+                      }
+                    >
+                      {product.stock}
+                    </span>
                   </TableCell>
                   <TableCell>{product.proveedor}</TableCell>
                   <TableCell>
                     <span
                       className={`inline-flex items-center px-2 py-1 rounded text-xs ${
-                        product.estado === "Activo" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                        product.estado === "Activo"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-gray-100 text-gray-800"
                       }`}
                     >
                       {product.estado}
@@ -739,7 +758,12 @@ function ProductsManagement({ products, setProducts }) {
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      <Dialog open={Boolean(editingProduct)} onOpenChange={(open) => { if (!open) setEditingProduct(null) }}>
+                      <Dialog
+                        open={Boolean(editingProduct)}
+                        onOpenChange={(open) => {
+                          if (!open) setEditingProduct(null);
+                        }}
+                      >
                         <DialogTrigger asChild>
                           <Button
                             variant="outline"
@@ -753,11 +777,16 @@ function ProductsManagement({ products, setProducts }) {
                         <DialogContent className="max-w-[95vw] sm:max-w-2xl">
                           <DialogHeader>
                             <DialogTitle>Editar Producto</DialogTitle>
-                            <DialogDescription>Modifica la información del producto</DialogDescription>
+                            <DialogDescription>
+                              Modifica la información del producto
+                            </DialogDescription>
                           </DialogHeader>
                           {editingProduct && (
                             <ProductForm
-                              product={editingProduct}
+                              product={{
+                                ...editingProduct,
+                                imagenes: editingProduct.imagenes || [],
+                              }}
                               onSave={handleSaveProduct}
                               onCancel={() => setEditingProduct(null)}
                             />
@@ -783,7 +812,7 @@ function ProductsManagement({ products, setProducts }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function ProductForm({

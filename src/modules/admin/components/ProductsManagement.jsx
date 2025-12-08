@@ -1,13 +1,30 @@
-import React, { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+// src/modules/admin/components/ProductsManagement.jsx
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
 import productService from "@/modules/store/services/productService";
 
-// mapeo de productos admin -> formato cliente
+// Mapeo de productos ADMIN ➜ CLIENTE
+// Lo que guardamos en localStorage para la tienda
 function mapAdminToClientProducts(adminProducts) {
   return adminProducts.map((p) => ({
     id: p.id, // P001, P002, etc.
@@ -17,19 +34,83 @@ function mapAdminToClientProducts(adminProducts) {
     stock: p.stock,
     category: p.categoria,
     provider: p.proveedor,
-    image: p.imagen || "/images/placeholder.png",
+    // imagen principal: primera del array o la imagen suelta, o placeholder
+    image:
+      (Array.isArray(p.imagenes) && p.imagenes.length > 0
+        ? p.imagenes[0]
+        : p.imagen) || "/images/placeholder.png",
+    // guardamos todas por si luego usamos slider en el front
+    images:
+      Array.isArray(p.imagenes) && p.imagenes.length > 0
+        ? p.imagenes
+        : p.imagen
+        ? [p.imagen]
+        : [],
+    status: p.estado ?? "Activo",
   }));
 }
+
+// Formulario de producto con drag & drop de imágenes
 function ProductForm({ product, onSave, onCancel, isNew = false }) {
-  const [formData, setFormData] = useState(product);
+  const [formData, setFormData] = useState({
+    ...product,
+    imagenes: product.imagenes || [],
+  });
+  const [isDragging, setIsDragging] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onSave(formData);
   };
 
+  const handleFiles = (files) => {
+    const fileArray = Array.from(files || []);
+    if (!fileArray.length) return;
+
+    // Usamos URL.createObjectURL para previsualizar (válido mientras la pestaña esté abierta)
+    const newUrls = fileArray.map((file) => URL.createObjectURL(file));
+
+    setFormData((prev) => ({
+      ...prev,
+      imagenes: [...(prev.imagenes || []), ...newUrls],
+    }));
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFiles(e.dataTransfer.files);
+      e.dataTransfer.clearData();
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleFileInputChange = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      handleFiles(e.target.files);
+    }
+  };
+
+  const removeImage = (url) => {
+    setFormData((prev) => ({
+      ...prev,
+      imagenes: prev.imagenes.filter((img) => img !== url),
+    }));
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Nombre y categoría */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <fieldset className="border border-slate-300 rounded-lg p-3">
           <legend className="text-xs text-slate-600 px-2">
@@ -59,8 +140,9 @@ function ProductForm({ product, onSave, onCancel, isNew = false }) {
         </fieldset>
       </div>
 
+      {/* Descripción */}
       <fieldset className="border border-slate-300 rounded-lg p-3">
-        <legend className="text-xs text-slate-600 px-2">Descripcion *</legend>
+        <legend className="text-xs text-slate-600 px-2">Descripción *</legend>
         <Textarea
           id="descripcion"
           className="border-none focus:ring-0 px-0"
@@ -73,6 +155,7 @@ function ProductForm({ product, onSave, onCancel, isNew = false }) {
         />
       </fieldset>
 
+      {/* Precio y stock */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <fieldset className="border border-slate-300 rounded-lg p-3">
           <legend className="text-xs text-slate-600 px-2">Precio *</legend>
@@ -106,6 +189,7 @@ function ProductForm({ product, onSave, onCancel, isNew = false }) {
         </fieldset>
       </div>
 
+      {/* Proveedor */}
       <fieldset className="border border-slate-300 rounded-lg p-3">
         <legend className="text-xs text-slate-600 px-2">Proveedor *</legend>
         <Input
@@ -119,20 +203,99 @@ function ProductForm({ product, onSave, onCancel, isNew = false }) {
         />
       </fieldset>
 
+      {/* URL principal opcional */}
       <fieldset className="border border-slate-300 rounded-lg p-3">
         <legend className="text-xs text-slate-600 px-2">
-          URL de la imagen
+          URL de la imagen principal (opcional)
         </legend>
         <Input
           id="imagen"
           type="url"
           className="border-none focus:ring-0 px-0"
-          value={formData.imagen}
+          value={formData.imagen || ""}
           onChange={(e) => setFormData({ ...formData, imagen: e.target.value })}
           placeholder="https://ejemplo.com/imagen.jpg"
         />
       </fieldset>
 
+      {/* Drag & Drop de imágenes extra */}
+      <fieldset className="border border-slate-300 rounded-lg p-3 space-y-3">
+        <legend className="text-xs text-slate-600 px-2">
+          Imágenes del producto (drag & drop o seleccionar) *
+        </legend>
+
+        <div
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          className={`flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-lg px-4 py-6 text-center cursor-pointer transition ${
+            isDragging
+              ? "border-brand-dark bg-slate-50"
+              : "border-slate-300 bg-white"
+          }`}
+          onClick={() => {
+            const input = document.getElementById("product-images-input");
+            if (input) input.click();
+          }}
+        >
+          <p className="text-xs md:text-sm text-slate-600">
+            Arrastra y suelta tus imágenes aquí, o haz clic para seleccionarlas.
+          </p>
+          <p className="text-[11px] text-slate-400">
+            Formatos permitidos: JPG, PNG, WEBP. Puedes subir varias.
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            className="mt-2 text-xs rounded-full px-4 border-brand-dark text-brand-dark"
+          >
+            Seleccionar archivos
+          </Button>
+          <input
+            id="product-images-input"
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={handleFileInputChange}
+          />
+        </div>
+
+        {/* Previsualización de imágenes */}
+        {formData.imagenes && formData.imagenes.length > 0 && (
+          <div className="mt-3">
+            <p className="text-xs text-slate-600 mb-2">
+              Imágenes cargadas ({formData.imagenes.length}):
+            </p>
+            <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
+              {formData.imagenes.map((url, idx) => (
+                <div
+                  key={idx}
+                  className="relative group border rounded-md overflow-hidden bg-slate-50"
+                >
+                  <img
+                    src={url}
+                    alt={`Imagen ${idx + 1}`}
+                    className="w-full h-24 object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeImage(url);
+                    }}
+                    className="absolute top-1 right-1 bg-black/60 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition"
+                  >
+                    Quitar
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </fieldset>
+
+      {/* Botones */}
       <div className="flex justify-center gap-4 pt-6">
         <Button
           type="button"
@@ -153,16 +316,20 @@ function ProductForm({ product, onSave, onCancel, isNew = false }) {
   );
 }
 
+// Vista principal de gestión de productos
 export default function ProductsManagement({ products, setProducts }) {
   const [editingProduct, setEditingProduct] = useState(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
 
+  // Sincroniza ADMIN ➜ CLIENTE (localStorage)
   const syncWithStore = (updatedAdminProducts) => {
-    // Actualiza el estado local del admin
     setProducts(updatedAdminProducts);
-    // Mapea y guarda en localStorage lo que verá el cliente
     const clientProducts = mapAdminToClientProducts(updatedAdminProducts);
-    productService.saveAll(clientProducts);
+    try {
+      productService.saveAll(clientProducts);
+    } catch (err) {
+      console.error("Error sincronizando catálogo de cliente:", err);
+    }
   };
 
   const handleSaveProduct = (product) => {
@@ -223,6 +390,7 @@ export default function ProductsManagement({ products, setProducts }) {
                 categoria: "",
                 proveedor: "",
                 imagen: "",
+                imagenes: [],
                 estado: "Activo",
               }}
               onSave={handleSaveProduct}
@@ -302,7 +470,10 @@ export default function ProductsManagement({ products, setProducts }) {
                         </DialogHeader>
                         {editingProduct && (
                           <ProductForm
-                            product={editingProduct}
+                            product={{
+                              ...editingProduct,
+                              imagenes: editingProduct.imagenes || [],
+                            }}
                             onSave={handleSaveProduct}
                             onCancel={() => setEditingProduct(null)}
                           />

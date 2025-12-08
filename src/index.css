@@ -1,9 +1,22 @@
-/* Brand color variables from brandbook */
-:root {
-    --color-brand: #8984D6;
-    --color-brand-dark: #6B5CA7;
-    --color-brand-light: #D9D9E8;
-}
+/* 1) Importar la fuente ANTES de todo */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+/* 2) Tailwind */
 @tailwind base;
+/* 3) Sobrescribir la fuente global aquí */
+@layer base {
+    body {
+        @apply font-poppins;
+    }
+}
+
+/* 4) Resto de Tailwind */
 @tailwind components;
 @tailwind utilities;
+
+/* 5) Tus variables (si quieres conservarlas) */
+:root {
+    --color-brand: #8984d6;
+    --color-brand-dark: #6b5ca7;
+    --color-brand-light: #d9d9e8;
+}
